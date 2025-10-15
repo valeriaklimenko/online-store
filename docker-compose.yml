@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  nginx:
+    build:
+      context: ./contaners/nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - php
+    networks:
+      - app-network
+
+  php:
+    build:
+      context: ./contaners/fpm
+      dockerfile: Dockerfile
+    container_name: php
+    restart: always
+    volumes:
+      - ./src:/var/www/html
+    expose:
+      - "9000"
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:16
+    container_name: my_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: php_docker
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
