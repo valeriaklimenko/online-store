@@ -2,24 +2,22 @@
 
 namespace App\Services\User;
 
-class AuthUserService
+use Illuminate\Support\Facades\Auth;
+class AuthService
 {
-    public function register(array $data): array
-    {
-        User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password'])
-        ]);
-        return User::create($data);
-    }
+    /**
+     * Authorizes user
+     */
     public function login(array $data): bool
     {
         return auth()->attempt($data);
     }
 
-    public function logout(): bool
+    /**
+     * User logout
+     */
+    public function logout()
     {
-        return auth()->logout();
+        auth()->logout();
     }
 }
