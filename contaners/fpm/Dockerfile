@@ -33,8 +33,10 @@ RUN { \
      echo 'opcache.revalidate_freq=2'; \
      echo 'opcache.fast_shutdown=1'; \
 } > /usr/local/etc/php/conf.d/opcache.ini
-RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+RUN docker-php-ext-configure pgsql --with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pgsql pdo_pgsql \
-    RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY fpm.conf /usr/local/etc/php-fpm.d/
 CMD ["php-fpm"]
+
+
