@@ -7,12 +7,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/login', [AuthController::class,'showLoginForm'])->name('loginForm');
-Route::post('/login',[AuthController::class, 'login'])->name('login');
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/register', [AuthController::class,'showRegisterForm'])->name('registerForm');
-Route::post('/register',[AuthController::class, 'register'])->name('register');
-Route::get('/profile', [AuthController::class,'profile'])->name('profile');
-Route::patch('/profile', [AuthController::class,'updateProfile'])->name('updateProfile');
-Route::get('/change-password', [AuthController::class,'showChangePasswordForm'])->name('changePasswordForm');
-Route::post('/change-password',[AuthController::class, 'changePassword'])->name('changePassword');
+Route::controller(AuthController::class)->group(function () {
+    Route::get('/login', 'showLoginForm')->name('loginForm');
+    Route::post('/login', 'login')->name('login');
+    Route::get('/logout', 'logout')->name('logout');
+    Route::post('/logout', 'logout')->name('logout');
+    Route::get('/register', 'showRegisterForm')->name('registerForm');
+    Route::post('/register', 'register')->name('register');
+    Route::get('/profile', 'profile')->name('profile');
+    Route::patch('/profile', 'updateProfile')->name('updateProfile');
+    Route::get('/change-password', 'showChangePasswordForm')->name('changePasswordForm');
+    Route::post('/change-password', 'changePassword')->name('changePassword');
+});
+
+
