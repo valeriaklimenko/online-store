@@ -2,7 +2,7 @@
 
 namespace App\Services\User;
 
-use Illuminate\Support\Facades\Auth;
+//use Illuminate\Support\Facades\Auth;
 class AuthService
 {
     /**

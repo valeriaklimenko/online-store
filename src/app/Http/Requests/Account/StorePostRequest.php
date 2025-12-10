@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Account;
 
-use http\Env\Request;
+//use http\Env\Request;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Controllers\Auth\AuthController;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
+
+//use App\Http\Controllers\Auth\AuthController;
+//use Illuminate\Http\RedirectResponse;
+//use Illuminate\Support\Facades\Auth;
 
 class StorePostRequest extends FormRequest
 {

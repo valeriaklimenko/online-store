@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Account;
 
-use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class RegisterRequest extends FormRequest
+class UpdateProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize():bool
+    public function authorize(): bool
     {
         return true;
     }
@@ -25,9 +25,9 @@ class RegisterRequest extends FormRequest
     public function rules():array
     {
         return [
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:8|confirmed'
+            'name' => 'string',
+            'email' => 'string|email|unique:users,email,'. Auth::id(),
         ];
+
     }
 }

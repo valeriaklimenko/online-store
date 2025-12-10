@@ -5,9 +5,9 @@ services:
     build:
       context: ./contaners/nginx
       dockerfile: Dockerfile
-    container_name: nginx
+    container_name: nginx1
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
       - ./src:/var/www/html
       - ./logs/nginx:/var/log/nginx
@@ -40,7 +40,7 @@ services:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: mysecretpassword
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     networks:

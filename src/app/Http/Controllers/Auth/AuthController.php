@@ -3,21 +3,18 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ChangePasswordRequest;
-use App\Http\Requests\RegisterRequest;
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdateProfileRequest;
-use App\Services\User\RegisterService;
+use App\Http\Requests\Account\ChangePasswordRequest;
+use App\Http\Requests\Account\RegisterRequest;
+use App\Http\Requests\Account\StorePostRequest;
+use App\Http\Requests\Account\UpdateProfileRequest;
 use App\Services\User\AuthService;
 use App\Services\User\PasswordService;
 use App\Services\User\ProfileService;
-use Exception;
+use App\Services\User\RegisterService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-
+use App\Models\User;
 
 
 class AuthController extends Controller
@@ -37,7 +34,7 @@ class AuthController extends Controller
     public function login(StorePostRequest $request, AuthService $authService): RedirectResponse
     {
         if ($authService->login($request->validated())) {
-            return redirect()->intended(route('profile'));
+            return redirect()->intended('/');
         }
         return redirect()->back()->withErrors(['email' => 'Credentials are not correct']);
     }
@@ -47,7 +44,7 @@ class AuthController extends Controller
      */
     public function logout(AuthService $authService): RedirectResponse
     {
-       $authService->logout();
+        $authService->logout();
         return redirect()->route('login');
     }
 
@@ -70,19 +67,38 @@ class AuthController extends Controller
     }
 
     /**
-     * returns a view of the profile form.
+     * Returns a view of the user profile form.
      */
     public function profile(): View
     {
-        $user = Auth::user();
-        return view('auth.profile', compact('user'));
+        return view('layouts.userProfile.profile', ['user' => Auth::user()]);
+    }
+
+    /**
+     * Returns a view of the admin profile form.
+     */
+    public function adminProfile(): View
+    {
+        return view('layouts.adminProfile.profile', ['user' => Auth::user()]);
+    }
+
+    /**
+     * Returns a view of the manager profile form.
+     */
+    public function managerProfile(): View
+    {
+        return view('layouts.managerProfile.profile', ['user' => Auth::user()]);
     }
 
     /**
      * handles updating user data (name and email).
+     *
      */
     public function updateProfile(UpdateProfileRequest $request, ProfileService $profileService): RedirectResponse
     {
+
+        /** @var \App\Models\User $user */
+
         $user = Auth::user();
         $profileService->update($user, $request->validated());
         return redirect()->route('profile');
@@ -101,8 +117,11 @@ class AuthController extends Controller
      */
     public function changePassword(ChangePasswordRequest $request, PasswordService $passwordService): RedirectResponse
     {
+
+        /** @var \App\Models\User $user */
+
         $user = auth()->user();
-       $passwordService->changePassword($user, $request->validated());
+        $passwordService->changePassword($user, $request->validated());
         return redirect()->route('profile')->with('status', 'Password successfully changed!');
     }
 }
