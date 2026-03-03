@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-//use App\Enums\Permissions;
+use App\Enums\Permissions;
 use App\Enums\Roles;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-
 
 class RolePermissionSeeder extends Seeder
 {
@@ -16,16 +15,61 @@ class RolePermissionSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-
+    public function run(): void
     {
-        Role::firstOrCreate(['name' => Roles::ADMIN]);
-        Role::firstOrCreate(['name' => Roles::USER]);
-        Role::firstOrCreate(['name' => Roles::MANAGER]);
-        Role::firstOrCreate(['name'=>Roles::GUEST]);
+        $guard = config('auth.defaults.guard', 'web');
+
+        $this->command->info('Creating permissions...');
+        foreach (Permissions::cases() as $permission) {
+            Permission::firstOrCreate(
+                [
+                    'name' => $permission->value,
+                    'guard_name' => $guard,
+                ]
+            );
+        }
+        $this->command->info('Permissions created successfully.');
+
+        $this->command->info('Creating roles...');
+        $adminRole = Role::firstOrCreate(
+            [
+                'name' => Roles::ADMIN->value,
+                'guard_name' => $guard,
+            ]
+        );
+
+        $managerRole = Role::firstOrCreate(
+            [
+                'name' => Roles::MANAGER->value,
+                'guard_name' => $guard,
+            ]
+        );
+
+        $userRole = Role::firstOrCreate(
+            [
+                'name' => Roles::USER->value,
+                'guard_name' => $guard,
+            ]
+        );
+
+        $guestRole = Role::firstOrCreate(
+            [
+                'name' => Roles::GUEST->value,
+                'guard_name' => $guard,
+            ]
+        );
+
+        $adminPermissions = Permissions::adminPermissions();
+        $adminRole->syncPermissions($adminPermissions);
+
+        $managerPermissions = Permissions::managerPermissions();
+        $managerRole->syncPermissions($managerPermissions);
+
+        $userPermissions = Permissions::userPermissions();
+        $userRole->syncPermissions($userPermissions);
+
+        $guestPermissions = Permissions::guestPermissions();
+        $guestRole->syncPermissions($guestPermissions);
+
     }
-//
-//    foreach (Permissions::defaultPermissions() as $permission) {
-//        Permission::firstOrCreate(['name' => $permission]);
-//        ->assignRole(Roles::USER);
 }

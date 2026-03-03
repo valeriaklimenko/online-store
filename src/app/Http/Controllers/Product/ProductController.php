@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers\Product;
 
+use App\Enums\FlashMessage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Products\ProductStoreRequest;
 use App\Http\Requests\Products\ProductUpdateRequest;
-use App\Services\Products\ProductDeleteService;
-use App\Services\Products\ProductCategoryService;
-use App\Services\Products\ProductListService;
-use App\Services\Products\ProductStoreService;
-use App\Services\Products\ProductUpdateService;
-use App\Services\Products\ProductViewDataService;
+use App\Models\Product;
+use App\Services\CategoryService;
+use App\Services\ProductService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -19,68 +17,70 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(ProductListService $listService): View
+    public function index(ProductService $productService): View
     {
-        $products = $listService->getPaginatedProducts();
+        $products = $productService->getPaginatedProducts();
         return view('products.index', compact('products'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(ProductCategoryService $categoryService): View
+    public function create(CategoryService $categoryService): View
     {
-        $categories = $categoryService->getCategories();
+        $categories = $categoryService->getAllCategories();
         return view('products.create', compact('categories'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProductStoreRequest $request, ProductStoreService $storeService): RedirectResponse
+    public function store(ProductStoreRequest $request, ProductService $productService): RedirectResponse
     {
-        $storeService->store($request->validated());
+        $productService->store($request->validated());
         return redirect()->route('products.index')
-            ->with('success', 'Product created successfully.');
+            ->with('success', FlashMessage::PRODUCT_CREATED->value);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id, ProductListService $listService, ProductViewDataService $viewDataService): View
+    public function show(Product $product, ProductService $productService): View
     {
-        $product = $listService->getProductWithRelations($id);
-        $galleryUrls = $viewDataService->getGalleryUrls($product);
+        $product->load(['images', 'category']);
+        $galleryUrls = $productService->getGalleryUrls($product);
         return view('products.show', compact('product', 'galleryUrls'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id, ProductListService $listService, ProductCategoryService $categoryService): View
+    public function edit(Product $product, CategoryService $categoryService): View
     {
-        $product = $listService->getProductForEdit($id);
-        $categories = $categoryService->getCategories();
+        $product->load('images');
+        $categories = $categoryService->getAllCategories();
         return view('products.edit', compact('product', 'categories'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProductUpdateRequest $request, string $id, ProductUpdateService $updateService): RedirectResponse
+    public function update(ProductUpdateRequest $request, Product $product, ProductService $productService): RedirectResponse
     {
-        $updateService->update($id, $request->validated());
+        $productId = (int) $product->id;
+        $productService->update($productId, $request->validated());
         return redirect()->route('products.index')
-            ->with('success', 'Product updated successfully');
+            ->with('success', FlashMessage::PRODUCT_UPDATED->value);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id, ProductDeleteService $deleteService): RedirectResponse
+    public function destroy(Product $product, ProductService $productService): RedirectResponse
     {
-        $deleteService->delete($id);
+        $productId = (int) $product->id;
+        $productService->delete($productId);
         return redirect()->route('products.index')
-            ->with('success', 'The product was successfully deleted');
+            ->with('success', FlashMessage::PRODUCT_DELETED->value);
     }
 }

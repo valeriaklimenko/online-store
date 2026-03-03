@@ -25,14 +25,20 @@ RUN apt-get update && apt-get install -y \
 #    opcache \
 RUN docker-php-ext-install mbstring opcache
 RUN { \
-     echo 'zend_extension=opcache.so'; \
-     echo 'opcache.enable=1'; \
-     echo 'opcache.memory_consumption=128'; \
-     echo 'opcache.interned_strings_buffer=8'; \
-     echo 'opcache.max_accelerated_files=4000'; \
-     echo 'opcache.revalidate_freq=2'; \
-     echo 'opcache.fast_shutdown=1'; \
+    echo 'zend_extension=opcache.so'; \
+    echo 'opcache.enable=1'; \
+    echo 'opcache.memory_consumption=128'; \
+    echo 'opcache.interned_strings_buffer=8'; \
+    echo 'opcache.max_accelerated_files=4000'; \
+    echo 'opcache.revalidate_freq=2'; \
+    echo 'opcache.fast_shutdown=1'; \
 } > /usr/local/etc/php/conf.d/opcache.ini
+
+RUN { \
+    echo 'upload_max_filesize = 20M'; \
+    echo 'post_max_size = 20M'; \
+    echo 'memory_limit = 256M'; \
+} > /usr/local/etc/php/conf.d/uploads.ini
 RUN docker-php-ext-configure pgsql --with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pgsql pdo_pgsql \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

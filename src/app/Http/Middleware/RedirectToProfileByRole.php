@@ -10,8 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 class RedirectToProfileByRole
 {
     /**
-     * Handle an incoming request.
-     *
      * Redirects authenticated users to their appropriate profile based on their role.
      */
     public function handle(Request $request, Closure $next): Response

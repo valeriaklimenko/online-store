@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Менеджеры — Klavera')
+@section('title', 'Managers — Klavera')
 
 @section('content')
     <div class="page-head">
         <div>
-            <p class="overline">Команда магазина</p>
-            <h1 class="section-title">Управление менеджерами</h1>
+            <p class="overline">Store Team</p>
+            <h1 class="section-title">Manager Management</h1>
         </div>
-        <a href="{{ route('managers.create') }}" class="btn btn-primary">Добавить менеджера</a>
+        <a href="{{ route('managers.create') }}" class="btn btn-primary">Add Manager</a>
     </div>
 
     @if(session('success'))
@@ -24,10 +24,10 @@
             <table class="table-shell">
                 <thead>
                     <tr>
-                        <th>Имя</th>
+                        <th>Name</th>
                         <th>Email</th>
-                        <th>Дата создания</th>
-                        <th class="text-right">Действия</th>
+                        <th>Created Date</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,10 +37,10 @@
                             <td>{{ $manager->email }}</td>
                             <td>{{ $manager->created_at->format('d.m.Y H:i') }}</td>
                             <td class="text-right">
-                                <form action="{{ route('managers.destroy', $manager->id) }}" method="POST" onsubmit="return confirm('Удалить менеджера {{ $manager->name }}?')">
+                                <form action="{{ route('managers.destroy', $manager->id) }}" method="POST" onsubmit="return confirm('Delete manager {{ $manager->name }}?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-ghost">Удалить</button>
+                                    <button type="submit" class="btn btn-ghost">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -55,24 +55,10 @@
             @endif
         @else
             <div class="empty-state">
-                <h3 class="section-heading">Менеджеры ещё не добавлены</h3>
-                <p>Создайте первого менеджера, чтобы дать ему доступ к панели управления.</p>
-                <a href="{{ route('managers.create') }}" class="btn btn-primary">Добавить менеджера</a>
+                <h3 class="section-heading">No Managers Added Yet</h3>
+                <p>Create your first manager to give them access to the control panel.</p>
+                <a href="{{ route('managers.create') }}" class="btn btn-primary">Add Manager</a>
             </div>
         @endif
     </div>
 @endsection
-
-
-
-
-
-
-
-
-
-
-
-
-
-

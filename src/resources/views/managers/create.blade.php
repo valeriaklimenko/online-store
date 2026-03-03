@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Новый менеджер — Klavera')
+@section('title', 'New Manager — Klavera')
 
 @section('content')
     <div class="page-head">
         <div>
-            <p class="overline">Команда магазина</p>
-            <h1 class="section-title">Добавить менеджера</h1>
+            <p class="overline">Store Team</p>
+            <h1 class="section-title">Add Manager</h1>
         </div>
-        <a href="{{ route('managers.index') }}" class="pill-btn">← Назад к списку</a>
+        <a href="{{ route('managers.index') }}" class="pill-btn">← Back to List</a>
     </div>
 
     @if ($errors->any())
@@ -26,7 +26,7 @@
             @csrf
 
             <div class="form-field">
-                <label for="name">Имя менеджера *</label>
+                <label for="name">Manager Name *</label>
                 <input type="text" id="name" name="name" value="{{ old('name') }}" required>
             </div>
 
@@ -36,23 +36,32 @@
             </div>
 
             <div class="form-field">
-                <label for="password">Пароль *</label>
+                <label for="password">Password *</label>
                 <input type="password" id="password" name="password" required minlength="8">
-                <p class="form-help">Минимальная длина пароля — 8 символов.</p>
+                <p class="form-help">Minimum password length is 8 characters.</p>
             </div>
 
             <div class="form-field">
-                <label for="password_confirmation">Подтверждение пароля *</label>
+                <label for="password_confirmation">Confirm Password *</label>
                 <input type="password" id="password_confirmation" name="password_confirmation" required minlength="8">
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Создать менеджера</button>
-                <a href="{{ route('managers.index') }}" class="btn btn-ghost">Отмена</a>
+                <button type="submit" class="btn btn-primary">Create Manager</button>
+                <a href="{{ route('managers.index') }}" class="btn btn-ghost">Cancel</a>
             </div>
         </form>
     </div>
 @endsection
+
+
+
+
+
+
+
+
+
 
 
 

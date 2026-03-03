@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Регистрация — Klavera')
+@section('title', 'Register — Klavera')
 
 @section('content')
     <div class="auth-shell">
         <div class="auth-card">
             <div class="auth-heading">
-                <p class="overline">Новый аккаунт</p>
-                <h1>Создайте профиль</h1>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Это займёт меньше минуты</p>
+                <p class="overline">New Account</p>
+                <h1>Create Profile</h1>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">It will take less than a minute</p>
             </div>
 
             @if ($errors->any())
@@ -24,7 +24,7 @@
             <form method="POST" action="{{ route('register') }}" class="form-stack">
                 @csrf
                 <div class="form-field">
-                    <label for="name">Имя</label>
+                    <label for="name">Name</label>
                     <input type="text" id="name" name="name" value="{{ old('name') }}" required>
                 </div>
                 <div class="form-field">
@@ -32,18 +32,18 @@
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required>
                 </div>
                 <div class="form-field">
-                    <label for="password">Пароль</label>
+                    <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
                 </div>
                 <div class="form-field">
-                    <label for="password_confirmation">Повторите пароль</label>
+                    <label for="password_confirmation">Confirm Password</label>
                     <input type="password" id="password_confirmation" name="password_confirmation" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Зарегистрироваться</button>
+                <button type="submit" class="btn btn-primary btn-full">Register</button>
             </form>
 
             <div class="auth-meta">
-                Уже есть аккаунт? <a href="{{ route('login') }}">Войдите</a>
+                Already have an account? <a href="{{ route('loginForm') }}">Login</a>
             </div>
         </div>
     </div>

@@ -2,13 +2,8 @@
 
 namespace App\Http\Requests\Account;
 
-//use http\Env\Request;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-
-//use App\Http\Controllers\Auth\AuthController;
-//use Illuminate\Http\RedirectResponse;
-//use Illuminate\Support\Facades\Auth;
 
 class StorePostRequest extends FormRequest
 {
@@ -31,7 +26,6 @@ class StorePostRequest extends FormRequest
         return [
             'email' => 'required|email',
             'password' => 'required',
-
         ];
     }
 }

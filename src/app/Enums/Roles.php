@@ -13,9 +13,4 @@ enum Roles: string
     {
         return array_column(self::cases(), 'value');
     }
-
-//    public static function casesArray(): array
-//    {
-//        return self::cases();
-//    }
 }

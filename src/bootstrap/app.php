@@ -19,7 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'admin' => \App\Http\Middleware\UserIsAdmin::class,
             'can.manage.products' => \App\Http\Middleware\ManageProducts::class,
+            'can.manage.categories' => \App\Http\Middleware\ManageCategories::class,
             'redirect.to.profile' => \App\Http\Middleware\RedirectToProfileByRole::class,
+            'ensure.user.can.delete.account' => \App\Http\Middleware\EnsureUserCanDeleteAccount::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

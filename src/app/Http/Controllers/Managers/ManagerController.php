@@ -2,25 +2,19 @@
 
 namespace App\Http\Controllers\Managers;
 
+use App\Enums\FlashMessage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Managers\ManagerStoreRequest;
-use App\Models\User;
-use App\Services\Managers\ManagerCreateService;
-use App\Services\Managers\ManagerDeleteService;
-use App\Services\Managers\ManagerListService;
-use App\Services\Managers\ManagerStoreService;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
+use App\Services\ManagerService;
 use Illuminate\Contracts\View\View;
-
+use Illuminate\Http\RedirectResponse;
 
 class ManagerController extends Controller
 {
-
     /**
      * Display manager dashboard.
      */
-    public function dashboard(): \Illuminate\Contracts\View\View
+    public function dashboard(): View
     {
         return view('managers.dashboard');
     }
@@ -28,9 +22,9 @@ class ManagerController extends Controller
     /**
      * Display a listing of managers.
      */
-    public function index(ManagerListService $listService): View
+    public function index(ManagerService $managerService): View
     {
-        $managers = $listService->getAllManagers();
+        $managers = $managerService->getAllManagers();
         return view('managers.index', compact('managers'));
     }
 
@@ -43,22 +37,22 @@ class ManagerController extends Controller
     }
 
     /**
-     * Created a new manager in storage.
+     * Create a new manager in storage.
      */
-    public function store(ManagerStoreRequest $request, ManagerStoreService $managerStoreService): RedirectResponse
+    public function store(ManagerStoreRequest $request, ManagerService $managerService): RedirectResponse
     {
-        $managerStoreService->store($request->validated());
+        $managerService->createManager($request->validated());
         return redirect()->route('managers.index')
-            ->with('success', 'Менеджер успешно создан');
+            ->with('success', FlashMessage::MANAGER_CREATED->value);
     }
 
     /**
      * Remove the specified manager from storage.
      */
-    public function destroy(string  $id, ManagerDeleteService $deleteManagerService): RedirectResponse
+    public function destroy(int $id, ManagerService $managerService): RedirectResponse
     {
-        $deleteManagerService->deleteManager($id);
+        $managerService->deleteManager($id);
         return redirect()->route('managers.index')
-            ->with('success', 'The manager was successfully deleted');
+            ->with('success', FlashMessage::MANAGER_DELETED->value);
     }
 }

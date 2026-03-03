@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Enums\Roles;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
@@ -14,6 +15,10 @@ class RegisterService
     public function register(array $data): User
     {
         $data['password'] = Hash::make($data['password']);
-        return User::create($data);
+        $user = User::create($data);
+
+        $user->syncRoles(Roles::USER->value);
+
+        return $user;
     }
 }

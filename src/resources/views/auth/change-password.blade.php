@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Смена пароля — Klavera')
+@section('title', 'Change Password — Klavera')
 
 @section('content')
     <div class="auth-shell">
         <div class="auth-card">
             <div class="auth-heading">
-                <p class="overline">Безопасность</p>
-                <h1>Обновите пароль</h1>
+                <p class="overline">Security</p>
+                <h1>Update Password</h1>
             </div>
 
             @if ($errors->any())
@@ -23,18 +23,18 @@
             <form method="POST" action="{{ route('changePassword') }}" class="form-stack">
                 @csrf
                 <div class="form-field">
-                    <label for="current_password">Текущий пароль</label>
+                    <label for="current_password">Current Password</label>
                     <input type="password" id="current_password" name="current_password" required>
                 </div>
                 <div class="form-field">
-                    <label for="new_password">Новый пароль</label>
+                    <label for="new_password">New Password</label>
                     <input type="password" id="new_password" name="new_password" required>
                 </div>
                 <div class="form-field">
-                    <label for="new_password_confirmation">Повторите пароль</label>
+                    <label for="new_password_confirmation">Confirm Password</label>
                     <input type="password" id="new_password_confirmation" name="new_password_confirmation" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Сохранить</button>
+                <button type="submit" class="btn btn-primary btn-full">Save</button>
             </form>
         </div>
     </div>

@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Управление товарами — Klavera')
+@section('title', 'Product Management — Klavera')
 
 @section('content')
     <div class="page-head">
         <div>
-            <p class="overline">Каталог</p>
-            <h1 class="section-title">Управление товарами</h1>
+            <p class="overline">Catalog</p>
+            <h1 class="section-title">Product Management</h1>
         </div>
-        <a href="{{ route('products.create') }}" class="btn btn-primary">Добавить товар</a>
+        <a href="{{ route('products.create') }}" class="btn btn-primary">Add Product</a>
     </div>
 
     @if(session('success'))
@@ -43,14 +43,14 @@
                         <div class="product-footer">
                             <div>
                                 <span class="product-price">${{ number_format($product->price, 2) }}</span>
-                                <p class="product-meta">Остаток: {{ $product->quantity }}</p>
+                                <p class="product-meta">Stock: {{ $product->quantity }}</p>
                             </div>
                             <div style="display: flex; gap: 0.5rem;">
-                                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-ghost">Редактировать</a>
-                                <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Удалить товар {{ $product->name }}?')">
+                                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-ghost">Edit</a>
+                                <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Delete product {{ $product->name }}?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-primary">Удалить</button>
+                                    <button type="submit" class="btn btn-primary">Delete</button>
                                 </form>
                             </div>
                         </div>
@@ -60,9 +60,9 @@
         </div>
     @else
         <div class="card empty-state">
-            <h3 class="section-heading">Товары не найдены</h3>
-            <p>Добавьте первый товар, чтобы начать наполнять витрину.</p>
-            <a href="{{ route('products.create') }}" class="btn btn-primary">Добавить товар</a>
+            <h3 class="section-heading">No Products Found</h3>
+            <p>Add your first product to start filling the showcase.</p>
+            <a href="{{ route('products.create') }}" class="btn btn-primary">Add Product</a>
         </div>
     @endif
 
@@ -72,4 +72,3 @@
         </div>
     @endif
 @endsection
-

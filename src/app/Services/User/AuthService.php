@@ -2,11 +2,12 @@
 
 namespace App\Services\User;
 
-//use Illuminate\Support\Facades\Auth;
 class AuthService
 {
     /**
      * Authorizes user
+     * @param array $data
+     * @return bool
      */
     public function login(array $data): bool
     {

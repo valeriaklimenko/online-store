@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,24 +13,19 @@
     <body>
         <header class="site-header">
             <div class="site-shell">
-                <a href="{{ url('/') }}" class="site-logo" title="На главную">
+                <a href="{{ url('/') }}" class="site-logo" title="Go to Home">
                     <img src="{{ asset('images/logo.png') }}" alt="Klavera Logo">
                     <span>Klavera</span>
                 </a>
-                <nav class="site-nav">
-                    <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'is-active' : '' }}">Главная</a>
-                    <a href="{{ url('/#products') }}">Каталог</a>
-                </nav>
                 <div class="site-actions">
                     @auth
-                        <a href="{{ route('profile') }}" class="pill-btn">Профиль</a>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="pill-btn pill-btn--solid">Выйти</button>
+                            <button type="submit" class="pill-btn pill-btn--solid">Logout</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="pill-btn">Войти</a>
-                        <a href="{{ route('register') }}" class="pill-btn pill-btn--solid">Регистрация</a>
+                        <a href="{{ route('loginForm') }}" class="pill-btn">Login</a>
+                        <a href="{{ route('registerForm') }}" class="pill-btn pill-btn--solid">Register</a>
                     @endauth
                 </div>
             </div>
@@ -41,7 +36,7 @@
         </main>
 
         <footer>
-            &copy; {{ date('Y') }} Klavera. Все права защищены.
+            &copy; {{ date('Y') }} Klavera. All rights reserved.
         </footer>
 
         @stack('scripts')

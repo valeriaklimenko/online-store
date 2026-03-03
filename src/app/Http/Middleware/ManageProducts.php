@@ -17,10 +17,9 @@ class ManageProducts
         $user = $request->user();
 
         if (!$user || !$user->hasAnyRole([Roles::ADMIN->value, Roles::MANAGER->value])) {
-            abort(403, 'Unauthorized access');
+            abort(Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);
     }
 }
-

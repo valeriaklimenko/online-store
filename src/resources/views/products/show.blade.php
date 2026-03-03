@@ -3,7 +3,7 @@
 @section('title', $product->name . ' — Klavera')
 
 @section('content')
-    <a href="{{ url('/#products') }}" class="pill-btn" style="margin-bottom: 1.5rem; display: inline-flex;">← Назад к каталогу</a>
+    <a href="{{ url('/#products') }}" class="pill-btn" style="margin-bottom: 1.5rem; display: inline-flex;">← Back to Catalog</a>
 
     <section class="card product-detail">
         <div>
@@ -20,7 +20,7 @@
                     <button
                         class="media-nav media-nav--prev"
                         type="button"
-                        aria-label="Предыдущая фотография"
+                        aria-label="Previous photo"
                         data-media-prev
                         @if($galleryUrls->count() <= 1) hidden @endif
                     >
@@ -31,7 +31,7 @@
                     <button
                         class="media-nav media-nav--next"
                         type="button"
-                        aria-label="Следующая фотография"
+                        aria-label="Next photo"
                         data-media-next
                         @if($galleryUrls->count() <= 1) hidden @endif
                     >
@@ -45,16 +45,15 @@
             @endif
         </div>
         <div class="product-summary">
-            <p class="overline">Klavera / Товар</p>
+            <p class="overline">Klavera / Product</p>
             <h1 style="font-family: 'Playfair Display', serif; font-size: 2.25rem;">{{ $product->name }}</h1>
             <p style="color: var(--text-muted);">
-                {{ $product->description ?? 'Описание появится позже.' }}
+                {{ $product->description ?? 'Description coming soon.' }}
             </p>
             <div>
                 <div class="product-price">${{ number_format($product->price, 2) }}</div>
-                <p class="product-meta">В наличии: {{ $product->quantity }}</p>
                 @if($product->category)
-                    <p class="product-meta">Категория: {{ $product->category->name }}</p>
+                    <p class="product-meta">Category: {{ $product->category->name }}</p>
                 @endif
             </div>
             <div class="product-actions">
@@ -63,12 +62,12 @@
                     id="detailCartBtn"
                     data-product-id="{{ $product->id }}"
                 >
-                    В корзину
+                    Add to Cart
                 </button>
                 <button
                     class="favorite-toggle"
                     id="detailFavoriteBtn"
-                    aria-label="Добавить в избранное"
+                    aria-label="Add to favorites"
                     data-product-id="{{ $product->id }}"
                 >
                     <svg viewBox="0 0 24 24">
@@ -103,21 +102,88 @@
 
         const favoriteBtn = document.getElementById('detailFavoriteBtn');
         const cartBtn = document.getElementById('detailCartBtn');
+        const isAuthenticated = @json(auth()->check());
 
         if (favoriteBtn) {
             const productId = favoriteBtn.dataset.productId;
-            if (favorites.has(productId)) {
-                favoriteBtn.classList.add('is-active');
+            
+            // Check favorites state on page load
+            if (isAuthenticated) {
+                fetch('{{ route("favorites.index") }}')
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const productLink = doc.querySelector(`a[href*="/products/${productId}"]`);
+                        if (productLink && productLink.closest('.card')) {
+                            favoriteBtn.classList.add('is-active');
+                        }
+                    })
+                    .catch(() => {});
             }
+
             favoriteBtn.addEventListener('click', () => {
-                if (favorites.has(productId)) {
-                    favorites.delete(productId);
-                    favoriteBtn.classList.remove('is-active');
-                } else {
-                    favorites.add(productId);
-                    favoriteBtn.classList.add('is-active');
+                // Check authentication
+                if (!isAuthenticated) {
+                    alert('To add product to favorites, please login');
+                    window.location.href = '{{ route("loginForm") }}';
+                    return;
                 }
-                persistSet(favoriteStorageKey, favorites);
+
+                const isActive = favoriteBtn.classList.contains('is-active');
+                favoriteBtn.disabled = true;
+
+                if (isActive) {
+                    // Remove from favorites
+                    const formData = new FormData();
+                    formData.append('product_id', productId);
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    fetch('{{ route("favorites.removeByProduct") }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            favoriteBtn.classList.remove('is-active');
+                        }
+                        favoriteBtn.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        favoriteBtn.disabled = false;
+                    });
+                } else {
+                    // Add to favorites
+                    const formData = new FormData();
+                    formData.append('product_id', productId);
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    fetch('{{ route("favorites.store") }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            favoriteBtn.classList.add('is-active');
+                        }
+                        favoriteBtn.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        favoriteBtn.disabled = false;
+                    });
+                }
             });
         }
 
@@ -126,28 +192,68 @@
             const isAuthenticated = @json(auth()->check());
             
             const updateCartState = (added) => {
-                cartBtn.textContent = added ? 'В корзине' : 'В корзину';
+                cartBtn.textContent = added ? 'In cart' : 'Add to cart';
                 cartBtn.classList.toggle('btn-ghost', added);
+                cartBtn.disabled = false;
             };
 
-            updateCartState(cartItems.has(productId));
+            // Check cart state on page load
+            if (isAuthenticated) {
+                fetch('{{ route("basket.index") }}')
+                    .then(response => response.text())
+                    .then(html => {
+                        // Check if product exists in cart HTML
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const productLink = doc.querySelector(`a[href*="/products/${productId}"]`);
+                        if (productLink && productLink.closest('.card')) {
+                            updateCartState(true);
+                        }
+                    })
+                    .catch(() => {});
+            }
 
             cartBtn.addEventListener('click', () => {
-                // Проверка авторизации
+                // Check authentication
                 if (!isAuthenticated) {
-                    alert('Чтобы добавить товар в корзину, необходимо авторизоваться');
-                    window.location.href = '{{ route("login") }}';
+                    alert('Please log in to add products to cart');
+                    window.location.href = '{{ route("loginForm") }}';
                     return;
                 }
 
-                if (cartItems.has(productId)) {
-                    cartItems.delete(productId);
-                    updateCartState(false);
-                } else {
-                    cartItems.add(productId);
+                cartBtn.disabled = true;
+                
+                // Add product to cart
+                const formData = new FormData();
+                formData.append('product_id', productId);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                fetch('{{ route("basket.store") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        return response.json().catch(() => ({}));
+                    }
+                })
+                .then(data => {
                     updateCartState(true);
-                }
-                persistSet(cartStorageKey, cartItems);
+                    // Reload page to sync with server
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    cartBtn.disabled = false;
+                    alert('An error occurred while adding product to cart');
+                });
             });
         }
 

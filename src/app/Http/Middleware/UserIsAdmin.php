@@ -18,7 +18,7 @@ class UserIsAdmin
         $user = $request->user();
 
         if (!$user || !$user->hasRole(Roles::ADMIN->value)) {
-            abort(403, 'Unauthorized access');
+            abort(403, Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

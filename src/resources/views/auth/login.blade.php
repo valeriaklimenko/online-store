@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Вход — Klavera')
+@section('title', 'Login — Klavera')
 
 @section('content')
     <div class="auth-shell">
         <div class="auth-card">
             <div class="auth-heading">
-                <p class="overline">Добро пожаловать</p>
-                <h1>Войдите в Klavera</h1>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Продолжите покупки и управляйте профилем</p>
+                <p class="overline">Welcome</p>
+                <h1>Login to Klavera</h1>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Continue shopping and manage your profile</p>
             </div>
 
             @if ($errors->any())
@@ -28,14 +28,14 @@
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus>
                 </div>
                 <div class="form-field">
-                    <label for="password">Пароль</label>
+                    <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Войти</button>
+                <button type="submit" class="btn btn-primary btn-full">Login</button>
             </form>
 
             <div class="auth-meta">
-                Нет аккаунта? <a href="{{ route('register') }}">Создайте его</a>
+                Don't have an account? <a href="{{ route('registerForm') }}">Create one</a>
             </div>
         </div>
     </div>
