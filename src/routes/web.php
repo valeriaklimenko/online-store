@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\Roles;
+use App\Enums\RoleSystem\Roles;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Basket\BasketController;
 use App\Http\Controllers\Category\CategoryController;
@@ -8,10 +8,10 @@ use App\Http\Controllers\Favorites\FavoritesController;
 use App\Http\Controllers\Managers\ManagerController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Profiles\AccountDeleteController;
-use App\Http\Controllers\Profiles\ChangeProfileController;
-use App\Http\Controllers\Profiles\UserProfileController;
 use App\Http\Controllers\Profiles\AdminProfileController;
+use App\Http\Controllers\Profiles\ChangeProfileController;
 use App\Http\Controllers\Profiles\ManagerProfileController;
+use App\Http\Controllers\Profiles\UserProfileController;
 use App\Http\Controllers\Register\RegisterController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;

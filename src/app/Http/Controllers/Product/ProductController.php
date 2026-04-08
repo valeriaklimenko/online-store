@@ -37,7 +37,8 @@ class ProductController extends Controller
      */
     public function store(ProductStoreRequest $request, ProductService $productService): RedirectResponse
     {
-        $productService->store($request->validated());
+        $productService->
+        store($request->validated());
         return redirect()->route('products.index')
             ->with('success', FlashMessage::PRODUCT_CREATED->value);
     }

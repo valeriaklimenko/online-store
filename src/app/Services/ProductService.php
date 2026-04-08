@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Filters\ProductFilterBuilder;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductQuantity;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,7 +25,17 @@ class ProductService
             $images = $data['images'] ?? [];
             unset($data['images']);
 
+            $quantity = $data ['quantity'] ?? 0;
+            unset($data['quantity']);
+
             $product = Product::create($data);
+
+            if ($quantity > 0) {
+                ProductQuantity::create([
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                ]);
+            }
 
             $storedImages = [];
             foreach ($images as $image) {
@@ -47,11 +58,12 @@ class ProductService
 
     public function update(int $id, array $data): bool
     {
-        $id = (int) $id;
+        $id = (int)$id;
 
         return DB::transaction(function () use ($id, $data) {
             $product = Product::lockForUpdate()->findOrFail($id);
 
+            $quantity = $data['quantity'] ?? 0;
             $newImages = $data['images'] ?? [];
             $removeImages = $data['remove_images'] ?? [];
             unset($data['images'], $data['remove_images']);
@@ -84,9 +96,13 @@ class ProductService
                 }
             }
 
-            if (isset($data['quantity'])) {
-                $data['quantity'] = max(0, (int) $data['quantity']);
+            if ($quantity !== null) {
+                $product->productQuantity()->updateOrCreate([
+                    ['product_id' => $id],
+                    ['quantity' => $quantity],
+                ]);
             }
+
 
             return $product->update($data);
         });
@@ -94,7 +110,7 @@ class ProductService
 
     public function delete(int $id): bool
     {
-        $id = (int) $id;
+        $id = (int)$id;
         $product = Product::findOrFail($id);
 
         foreach ($product->images as $image) {
@@ -123,7 +139,7 @@ class ProductService
 
     public function getProductForEdit(string $id): Product
     {
-        $id = (int) $id;
+        $id = (int)$id;
         return Product::with('images')->findOrFail($id);
     }
 
@@ -137,8 +153,8 @@ class ProductService
         $allowedSortBy = ['name', 'price'];
         $allowedSortOrder = ['asc', 'desc'];
 
-        $sortBy = (string) ($params['sort_by'] ?? 'name');
-        $sortOrder = strtolower((string) ($params['sort_order'] ?? 'asc'));
+        $sortBy = (string)($params['sort_by'] ?? 'name');
+        $sortOrder = strtolower((string)($params['sort_order'] ?? 'asc'));
 
         if (!in_array($sortBy, $allowedSortBy, true)) {
             $sortBy = 'name';
@@ -149,7 +165,7 @@ class ProductService
 
         $query->orderBy($sortBy, $sortOrder);
 
-        $perPage = (int) ($params['per_page'] ?? 15);
+        $perPage = (int)($params['per_page'] ?? 15);
         if ($perPage < 1) {
             $perPage = 15;
         }
@@ -169,13 +185,13 @@ class ProductService
         }
 
         if (!empty($params['category_id'])) {
-            $filters['category_id'] = (int) $params['category_id'];
+            $filters['category_id'] = (int)$params['category_id'];
         }
 
         if (!empty($params['min_price']) || !empty($params['max_price'])) {
             $filters['price_range'] = [
-                isset($params['min_price']) ? (float) $params['min_price'] : 0,
-                isset($params['max_price']) ? (float) $params['max_price'] : null
+                isset($params['min_price']) ? (float)$params['min_price'] : 0,
+                isset($params['max_price']) ? (float)$params['max_price'] : null
             ];
         }
 
@@ -199,7 +215,7 @@ class ProductService
 
     public function searchByName(string $query, int $limit = 6): Collection
     {
-        $limit = (int) $limit;
+        $limit = (int)$limit;
         $queryLower = mb_strtolower($query);
         return Product::with(['images', 'category'])
             ->whereRaw('LOWER(name) LIKE ?', ['%' . $queryLower . '%'])
@@ -210,7 +226,7 @@ class ProductService
 
     public function searchByNameAndDescription(string $query, int $limit = 6): Collection
     {
-        $limit = (int) $limit;
+        $limit = (int)$limit;
         $queryLower = mb_strtolower($query);
         return Product::with(['images', 'category'])
             ->where(function (Builder $q) use ($queryLower) {
@@ -238,7 +254,7 @@ class ProductService
             ->filter()
             ->unique()
             ->values()
-            ->map(fn ($path) => asset('storage/' . $path));
+            ->map(fn($path) => asset('storage/' . $path));
     }
 
     public function getCoverImage(?Product $product): ?string

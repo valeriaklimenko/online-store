@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Profiles;
 
 use App\Enums\FlashMessage;
-use App\Enums\Roles;
+use App\Enums\RoleSystem\Roles;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\UpdateProfileRequest;
-use App\Models\User;
 use App\Services\User\PasswordService;
 use App\Services\User\ProfileService;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;

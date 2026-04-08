@@ -2,9 +2,9 @@
 
 namespace App\Services\User;
 
-use App\Enums\Roles;
-use Illuminate\Support\Facades\Hash;
+use App\Enums\RoleSystem\Roles;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 
 class RegisterService

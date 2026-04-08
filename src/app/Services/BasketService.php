@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Basket;
 use App\Models\BasketItems;
 use App\Models\Product;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class BasketService
@@ -54,7 +53,7 @@ class BasketService
     /**
      * Get or create basket for user
      */
-    public function getForUser(User $user): Basket
+    public function getForUser($user): Basket
     {
         return Basket::firstOrCreate(
             ['user_id' => $user->id],

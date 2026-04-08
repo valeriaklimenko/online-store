@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\Roles;
+use App\Enums\RoleSystem\Roles;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
