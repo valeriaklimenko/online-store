@@ -22,6 +22,7 @@ enum FlashMessage: string
 
     case MANAGER_CREATED = 'Manager created successfully';
     case MANAGER_DELETED = 'The manager was successfully deleted';
+    case BANNER_CREATED = 'Banner created successfully.';
 
     case EMAIL_CHANGE_PENDING = 'A verification email has been sent to your new email address. Please check your inbox.';
     case ACCOUNT_UPDATED = 'Profile successfully updated!';

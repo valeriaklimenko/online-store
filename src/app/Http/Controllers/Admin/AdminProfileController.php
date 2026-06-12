@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Profiles;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\View\View;
