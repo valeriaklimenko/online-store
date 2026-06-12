@@ -18,10 +18,12 @@ class Product extends Model
         'description',
         'price',
         'image',
+        'is_new_collection',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'is_new_collection' => 'boolean',
     ];
 
     public function images(): HasMany
@@ -37,5 +39,10 @@ class Product extends Model
     public function productQuantity(): HasOne
     {
         return $this->hasOne(ProductQuantity::class);
+    }
+
+    public function sizes(): HasMany
+    {
+        return $this->hasMany(ProductSize::class);
     }
 }

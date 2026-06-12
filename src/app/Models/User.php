@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\BCryptCaster;
 use App\Notifications\VerifyEmailQueued;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,12 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var list<string>
      */
+
+    protected $casts = [
+        'email' => BCryptCaster::class,
+        'new_email' => BCryptCaster::class,
+    ];
+
     protected $fillable = [
         'name',
         'email',

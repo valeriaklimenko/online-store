@@ -31,7 +31,7 @@ class AuthController extends Controller
         }
         return redirect()
             ->back()
-            ->withErrors(['email' => FlashMessage::LOGIN_FAILED]);
+            ->withErrors(['email' => FlashMessage::LOGIN_FAILED->value]);
     }
 
     /**
@@ -44,6 +44,6 @@ class AuthController extends Controller
 
         return redirect()
             ->route('loginForm')
-            ->with('status', FlashMessage::LOGOUT_SUCCESSFUL);
+            ->with('status', FlashMessage::LOGOUT_SUCCESSFUL->value);
     }
 }

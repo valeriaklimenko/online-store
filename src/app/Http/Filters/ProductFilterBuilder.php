@@ -14,6 +14,7 @@ class ProductFilterBuilder
             'query' => NameFilter::class,
             'category_id' => CategoryFilter::class,
             'price_range' => PriceRangeFilter::class,
+            'new_collection' => NewCollectionFilter::class,
         ];
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Managers;
+namespace App\Http\Controllers\Admin;
 
 use App\Enums\FlashMessage;
 use App\Http\Controllers\Controller;

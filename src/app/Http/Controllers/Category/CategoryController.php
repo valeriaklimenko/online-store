@@ -78,4 +78,3 @@ class CategoryController extends Controller
             ->with('success', FlashMessage::CATEGORY_DELETED->value);
     }
 }
-//пересмотреть

@@ -29,6 +29,7 @@ class SearchProductRequest extends FormRequest
             'sort_by' => 'nullable|string|in:name,price',
             'sort_order' => 'nullable|string|in:asc,desc',
             'per_page' => 'nullable|integer|min:1|max:100',
+            'new_collection' => 'nullable|boolean',
         ];
     }
 }
