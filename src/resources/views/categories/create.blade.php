@@ -8,7 +8,7 @@
             <p class="overline">Catalog</p>
             <h1 class="section-title">Add New Category</h1>
         </div>
-        <a href="{{ route('categories.index') }}" class="pill-btn">← Back to Category Management</a>
+        <a href="{{ route('categories.index') }}" class="btn btn-ghost">← Back to categories</a>
     </div>
 
     @if ($errors->any())

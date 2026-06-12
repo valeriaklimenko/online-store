@@ -8,84 +8,58 @@
     </div>
 
     @if(session('success'))
-        <div style="background: #10b981; color: white; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
-            {{ session('success') }}
-        </div>
+        <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     @if(session('error'))
-        <div style="background: #ef4444; color: white; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
-            {{ session('error') }}
-        </div>
+        <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
     @if($data['items']->isEmpty())
-        <div class="empty-state">
-            <h2 class="section-heading">Favorites is empty</h2>
-            <p>Add products to favorites to save them for later.</p>
-            <a href="{{ route('home') }}" class="pill-btn pill-btn--solid" style="margin-top: 1rem; display: inline-block;">
-                Go to catalog
-            </a>
+        <div class="card empty-state">
+            <h2 class="section-heading">No favorites yet</h2>
+            <p>Save products you love to find them here later.</p>
+            <a href="{{ route('home') }}#products" class="btn btn-primary">Go to catalog</a>
         </div>
     @else
-        <div style="display: grid; gap: 1.5rem;">
+        <div class="line-items-stack">
             @foreach($data['items'] as $item)
-                <div class="card" style="display: flex; gap: 1.5rem; align-items: center;">
-                    <div style="flex-shrink: 0;">
+                <div class="card line-item">
+                    <div class="line-item__media">
                         @php
                             $cover = $item->product->image ?? optional($item->product->images->first())->path;
                         @endphp
                         @if($cover)
-                            <img
-                                src="{{ asset('storage/' . $cover) }}"
-                                alt="{{ $item->product->name }}"
-                                style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px;"
-                            >
+                            <img src="{{ asset('storage/' . $cover) }}" alt="{{ $item->product->name }}">
                         @else
-                            <div style="width: 120px; height: 120px; background: var(--accent-soft); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
-                                📦
-                            </div>
+                            <span class="line-item__placeholder" aria-hidden="true">📦</span>
                         @endif
                     </div>
 
-                    <div style="flex: 1;">
-                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
-                            <a href="{{ route('products.show', $item->product->id) }}" style="color: inherit; text-decoration: none;">
-                                {{ $item->product->name }}
-                            </a>
+                    <div class="line-item__body">
+                        <h3 class="line-item__title">
+                            <a href="{{ route('products.show', $item->product->id) }}">{{ $item->product->name }}</a>
                         </h3>
                         @if($item->product->description)
-                            <p style="color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.95rem;">
-                                {{ \Illuminate\Support\Str::limit($item->product->description, 100) }}
-                            </p>
+                            <p class="form-help">{{ \Illuminate\Support\Str::limit($item->product->description, 100) }}</p>
                         @endif
                         @if($item->product->category)
-                            <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">
-                                {{ $item->product->category->name }}
-                            </span>
+                            <span class="badge">{{ $item->product->category->name }}</span>
                         @endif
-                        <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 1.25rem; font-weight: 600; color: var(--accent);">
-                                    ${{ number_format($item->product->price, 2) }}
-                                </span>
-                            </div>
-                        </div>
+                        <p class="line-item__price" style="margin-top: 0.75rem;">${{ number_format($item->product->price, 2) }}</p>
                     </div>
 
-                    <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <form action="{{ route('basket.store') }}" method="POST" style="display: inline;">
+                    <div class="line-item__actions">
+                        <form action="{{ route('basket.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $item->product->id }}">
-                            <button type="submit" class="pill-btn pill-btn--solid">
-                                Add to Basket
-                            </button>
+                            <button type="submit" class="btn btn-primary btn-small">Add to basket</button>
                         </form>
-                        <form action="{{ route('favorites.destroy', $item->id) }}" method="POST" style="display: inline;">
+                        <form action="{{ route('favorites.destroy', $item->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="pill-btn" style="color: #ef4444; border-color: #ef4444;"
-                                    onclick="return confirm('Are you sure you want to remove this item from favorites?')">
+                            <button type="submit" class="btn btn-danger btn-small"
+                                    onclick="return confirm('Remove from favorites?')">
                                 Remove
                             </button>
                         </form>
@@ -94,10 +68,8 @@
             @endforeach
         </div>
 
-        <div style="margin-top: 1.5rem; text-align: center;">
-            <a href="{{ route('home') }}" class="pill-btn">
-                Continue shopping
-            </a>
-        </div>
+        <p style="text-align: center; margin-top: 1.5rem;">
+            <a href="{{ route('home') }}#products" class="btn btn-ghost">Continue shopping</a>
+        </p>
     @endif
 @endsection

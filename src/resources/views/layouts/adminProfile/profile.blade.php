@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@php
+    /** @var \App\Models\User $user */
+@endphp
+
 @section('title', 'Profile — ' . $user->name)
 
 @section('content')
@@ -9,9 +13,11 @@
 
     <section class="profile-grid">
         <article class="card profile-card">
-            <p class="overline">Klavera Team</p>
-            <span class="badge" style="margin-bottom: 1rem;">Administrator</span>
-            <div class="profile-data-section">
+            <p class="overline">Klavera team</p>
+            <span class="badge">Administrator</span>
+            <h2 class="profile-prefs__title">My preferences <span class="profile-prefs__arrow" aria-hidden="true">→</span></h2>
+
+            <div class="profile-prefs-box profile-data-section">
                 <div class="profile-data-item">
                     <div class="profile-data-label">Username</div>
                     <div class="profile-data-value">{{ $user->name }}</div>
@@ -22,69 +28,51 @@
                     <div class="profile-data-value">{{ $user->email }}</div>
                     <button type="button" class="btn btn-ghost btn-small" onclick="toggleEditEmail()">Change email</button>
                 </div>
-                <div class="profile-data-item">
-                    <a href="{{ route('changePasswordForm') }}" class="btn btn-ghost btn-small">Change password</a>
-                </div>
+            </div>
+
+            <div class="profile-data-item" style="padding: 1.25rem 0 0; border: none;">
+                <a href="{{ route('changePasswordForm') }}" class="btn btn-ghost btn-small">Change password</a>
+            </div>
+
+            <div class="account-actions" style="grid-template-columns: 1fr;">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-ghost">Log out</button>
+                </form>
             </div>
         </article>
 
         <article class="card profile-menu-card">
-            <h2>Control Panel</h2>
+            <h2>Control panel</h2>
             <ul class="profile-menu">
                 <li>
-                    <a href="{{ route('basket.index') }}">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        <span>Basket</span>
-                    </a>
-                </li>
-                <li>
                     <a href="{{ route('products.index') }}">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                        </svg>
-                        <span>Product Management</span>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        <span>Product management</span>
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('managers.index') }}">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        <span>Manager Team</span>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span>Manager team</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                        </svg>
-                        <span>Business Analytics</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-                        </svg>
-                        <span>Store Orders</span>
+                    <a href="{{ route('manage.orders.index') }}">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        <span>Order management</span>
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('categories.index') }}">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                        </svg>
-                        <span>Category Management</span>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                        <span>Categories</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                        </svg>
-                        <span>Users</span>
+                    <a href="{{ route('admin.banner.edit') }}">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>Homepage banner</span>
                     </a>
                 </li>
             </ul>
@@ -95,7 +83,7 @@
         <div class="settings-modal-content">
             <div class="settings-modal-header">
                 <h2>Change name</h2>
-                <button class="close-modal" onclick="toggleEditName()">&times;</button>
+                <button type="button" class="close-modal" onclick="toggleEditName()" aria-label="Close">&times;</button>
             </div>
             <form method="POST" action="{{ route('updateProfile') }}" class="form-stack">
                 @csrf
@@ -113,12 +101,11 @@
         </div>
     </div>
 
-    <!-- Edit Email Form -->
     <div class="settings-modal" id="editEmailModal">
         <div class="settings-modal-content">
             <div class="settings-modal-header">
                 <h2>Change email</h2>
-                <button class="close-modal" onclick="toggleEditEmail()">&times;</button>
+                <button type="button" class="close-modal" onclick="toggleEditEmail()" aria-label="Close">&times;</button>
             </div>
             <form method="POST" action="{{ route('updateProfile') }}" class="form-stack">
                 @csrf
@@ -136,20 +123,14 @@
         </div>
     </div>
 
-    <!-- Email Change Verification Modal -->
     <div class="settings-modal" id="emailChangeVerificationModal">
         <div class="settings-modal-content">
             <div class="settings-modal-header">
-                <h2>Email Verification Required</h2>
-                <button class="close-modal" onclick="toggleEmailChangeVerification()">&times;</button>
+                <h2>Email verification required</h2>
+                <button type="button" class="close-modal" onclick="toggleEmailChangeVerification()" aria-label="Close">&times;</button>
             </div>
             <div class="form-stack">
-                <p style="color: var(--text-main); margin-bottom: 1rem;">
-                    Please check your email inbox to verify your new email address. We've sent a verification link to your new email address.
-                </p>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-                    Click on the verification link in the email to complete the email change process.
-                </p>
+                <p>Please check your inbox to verify your new email address.</p>
                 <div class="form-actions">
                     <button type="button" class="btn btn-primary btn-full" onclick="toggleEmailChangeVerification()">Got it</button>
                 </div>
@@ -157,81 +138,21 @@
         </div>
     </div>
 
-    @push('styles')
-        <style>
-            .profile-data-section {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
-            .profile-data-item {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .profile-data-label {
-                font-size: 0.85rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: var(--text-muted);
-                font-weight: 600;
-            }
-
-            .profile-data-value {
-                font-size: 1.1rem;
-                color: var(--text-main);
-                font-weight: 500;
-                padding: 0.5rem 0;
-            }
-
-            .btn-small {
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-                align-self: flex-start;
-            }
-        </style>
-    @endpush
-
     @push('scripts')
         <script>
-            function toggleEditName() {
-                const modal = document.getElementById('editNameModal');
-                modal.classList.toggle('active');
-            }
-
-            function toggleEditEmail() {
-                const modal = document.getElementById('editEmailModal');
-                modal.classList.toggle('active');
-            }
-
-            function toggleEmailChangeVerification() {
-                const modal = document.getElementById('emailChangeVerificationModal');
-                modal.classList.toggle('active');
-            }
+            function toggleEditName() { document.getElementById('editNameModal').classList.toggle('active'); }
+            function toggleEditEmail() { document.getElementById('editEmailModal').classList.toggle('active'); }
+            function toggleEmailChangeVerification() { document.getElementById('emailChangeVerificationModal').classList.toggle('active'); }
 
             document.addEventListener('click', (event) => {
-                const nameModal = document.getElementById('editNameModal');
-                const emailModal = document.getElementById('editEmailModal');
-                const verificationModal = document.getElementById('emailChangeVerificationModal');
-                
-                if (nameModal && nameModal.classList.contains('active') && event.target === nameModal) {
-                    toggleEditName();
-                }
-                if (emailModal && emailModal.classList.contains('active') && event.target === emailModal) {
-                    toggleEditEmail();
-                }
-                if (verificationModal && verificationModal.classList.contains('active') && event.target === verificationModal) {
-                    toggleEmailChangeVerification();
-                }
+                ['editNameModal', 'editEmailModal', 'emailChangeVerificationModal'].forEach((id) => {
+                    const modal = document.getElementById(id);
+                    if (modal?.classList.contains('active') && event.target === modal) modal.classList.remove('active');
+                });
             });
 
-            // Show verification modal if email was changed
             @if(session('email_change_pending'))
-                document.addEventListener('DOMContentLoaded', function() {
-                    toggleEmailChangeVerification();
-                });
+            document.addEventListener('DOMContentLoaded', toggleEmailChangeVerification);
             @endif
         </script>
     @endpush

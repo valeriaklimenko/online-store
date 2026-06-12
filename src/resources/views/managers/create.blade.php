@@ -8,7 +8,7 @@
             <p class="overline">Store Team</p>
             <h1 class="section-title">Add Manager</h1>
         </div>
-        <a href="{{ route('managers.index') }}" class="pill-btn">← Back to List</a>
+        <a href="{{ route('managers.index') }}" class="btn btn-ghost">← Back to managers</a>
     </div>
 
     @if ($errors->any())

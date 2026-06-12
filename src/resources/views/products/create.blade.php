@@ -8,7 +8,7 @@
             <p class="overline">Catalog</p>
             <h1 class="section-title">Add New Product</h1>
         </div>
-        <a href="{{ route('products.index') }}" class="pill-btn">← Back to Product Management</a>
+        <a href="{{ route('products.index') }}" class="btn btn-ghost">← Back to products</a>
     </div>
 
     @if ($errors->any())
@@ -65,6 +65,13 @@
             <div class="form-field">
                 <label for="quantity">Quantity *</label>
                 <input type="number" id="quantity" name="quantity" min="0" value="{{ old('quantity', 0) }}" required>
+            </div>
+
+            <div class="form-field">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="is_new_collection" value="1" @checked(old('is_new_collection'))>
+                    New collection (shown when visitors click SHOP NOW on homepage)
+                </label>
             </div>
 
             <div class="form-field">

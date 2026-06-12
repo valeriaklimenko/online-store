@@ -3,7 +3,7 @@
 @section('title', $product->name . ' — Klavera')
 
 @section('content')
-    <a href="{{ url('/#products') }}" class="pill-btn" style="margin-bottom: 1.5rem; display: inline-flex;">← Back to Catalog</a>
+    <a href="{{ url('/#products') }}" class="btn btn-ghost" style="margin-bottom: 1.5rem;">← Back to catalog</a>
 
     <section class="card product-detail">
         <div>
@@ -46,7 +46,7 @@
         </div>
         <div class="product-summary">
             <p class="overline">Klavera / Product</p>
-            <h1 style="font-family: 'Playfair Display', serif; font-size: 2.25rem;">{{ $product->name }}</h1>
+            <h1>{{ $product->name }}</h1>
             <p style="color: var(--text-muted);">
                 {{ $product->description ?? 'Description coming soon.' }}
             </p>
@@ -242,7 +242,7 @@
                         return response.json().catch(() => ({}));
                     }
                 })
-                .then(data => {
+                .then(() => {
                     updateCartState(true);
                     // Reload page to sync with server
                     setTimeout(() => {

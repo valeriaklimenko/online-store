@@ -6,9 +6,9 @@
     <div class="auth-shell">
         <div class="auth-card">
             <div class="auth-heading">
-                <p class="overline">Welcome</p>
-                <h1>Login to Klavera</h1>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Continue shopping and manage your profile</p>
+                <p class="overline klavera-app-logo" style="margin-bottom: 1.5rem;">Klavera</p>
+                <h1>Sign in</h1>
+                <p class="form-help">Sign in or create an account to access orders and favorites.</p>
             </div>
 
             @if ($errors->any())
@@ -31,7 +31,7 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Login</button>
+                <button type="submit" class="btn btn-primary btn-full">Continue</button>
             </form>
 
             <div class="auth-meta">

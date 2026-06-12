@@ -20,37 +20,36 @@
     @endif
 
     @if($products->count())
-        <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+        <div class="admin-products-grid">
             @foreach($products as $product)
-                <article class="product-card" style="cursor: default;">
-                    <div class="product-image" style="height: 220px;">
+                <article class="admin-product-card">
+                    <div class="admin-product-card__media">
                         @if($product->image)
                             <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
                         @else
-                            <span>📦</span>
+                            <span class="admin-product-card__placeholder" aria-hidden="true">📦</span>
                         @endif
                     </div>
-                    <div class="product-info">
+                    <div class="admin-product-card__body">
                         @if($product->category)
-                            <span class="badge" style="align-self: flex-start; margin-bottom: 0.5rem;">
-                                {{ $product->category->name }}
-                            </span>
+                            <span class="badge">{{ $product->category->name }}</span>
                         @endif
-                        <h3 class="product-name">{{ $product->name }}</h3>
-                        <p class="product-description">
+                        <h3 class="admin-product-card__name">{{ $product->name }}</h3>
+                        <p class="admin-product-card__desc">
                             {{ \Illuminate\Support\Str::limit($product->description, 110) }}
                         </p>
-                        <div class="product-footer">
+                        <div class="admin-product-card__footer">
                             <div>
-                                <span class="product-price">${{ number_format($product->price, 2) }}</span>
-                                <p class="product-meta">Stock: {{ $product->quantity }}</p>
+                                <div class="admin-product-card__price">${{ number_format($product->price, 2) }}</div>
+                                <p class="form-help">Stock: {{ $product->quantity }}</p>
                             </div>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-ghost">Edit</a>
-                                <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Delete product {{ $product->name }}?')">
+                            <div class="admin-product-card__actions">
+                                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-ghost btn-small">Edit</a>
+                                <form action="{{ route('products.destroy', $product->id) }}" method="POST"
+                                      onsubmit="return confirm('Delete product «{{ $product->name }}»?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-primary">Delete</button>
+                                    <button type="submit" class="btn btn-danger btn-small">Delete</button>
                                 </form>
                             </div>
                         </div>
@@ -60,7 +59,7 @@
         </div>
     @else
         <div class="card empty-state">
-            <h3 class="section-heading">No Products Found</h3>
+            <h2 class="section-heading">No Products Found</h2>
             <p>Add your first product to start filling the showcase.</p>
             <a href="{{ route('products.create') }}" class="btn btn-primary">Add Product</a>
         </div>
