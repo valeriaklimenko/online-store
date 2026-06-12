@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\FavoriteItems;
 use App\Models\Favorites;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,6 +30,7 @@ class FavoriteService
             throw new \RuntimeException('User not found');
         }
 
+        /** @var User $user */
         return $this->getForUser($user);
     }
 

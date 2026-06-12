@@ -11,6 +11,7 @@ enum FlashMessage: string
     case CATEGORY_CREATED = 'Category created successfully';
     case CATEGORY_UPDATED = 'Category updated successfully';
     case CATEGORY_DELETED = 'Category deleted successfully';
+    case ACCESS_DENIED = 'Only administrators can manage categories.';
 
     case FAVORITES_ADDED = 'Item was successfully added to favorites';
     case FAVORITES_REMOVED = 'Item was successfully removed from favorites';

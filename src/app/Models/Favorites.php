@@ -15,6 +15,8 @@ class Favorites extends Model
         'user_id',
     ];
 
+    protected $with = ['items'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

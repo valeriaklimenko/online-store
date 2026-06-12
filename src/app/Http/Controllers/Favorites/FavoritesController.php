@@ -9,7 +9,6 @@ use App\Services\FavoriteService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class FavoritesController extends Controller
 {
@@ -26,7 +25,10 @@ class FavoritesController extends Controller
     /**
      * Add product to favorites
      */
-    public function store(FavoriteStoreRequest $request, FavoriteService $favoriteService): JsonResponse|RedirectResponse
+    public function store(
+        FavoriteStoreRequest $request,
+        FavoriteService      $favoriteService
+    ): JsonResponse|RedirectResponse
     {
         $favorites = $favoriteService->getForCurrentUser();
         $favoriteService->addItem($favorites, $request->validated()['product_id']);

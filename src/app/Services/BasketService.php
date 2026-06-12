@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Basket;
 use App\Models\BasketItems;
-use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 
 class BasketService
@@ -39,7 +38,6 @@ class BasketService
      */
     public function getBasketData(Basket $basket): array
     {
-
         $items = $basket->items()->with('product.images')->get();
 
         return [
@@ -69,7 +67,7 @@ class BasketService
         $user = Auth::user();
 
         if (!$user) {
-            throw new \RuntimeException('User not found');
+            throw new \RuntimeException('User not authenticated');
         }
 
         return $this->getForUser($user);
@@ -90,10 +88,6 @@ class BasketService
      */
     public function addItem(Basket $basket, int $productId): BasketItems
     {
-
-        $productId = (int) $productId;
-        $product = Product::findOrFail($productId);
-
         $existingItem = BasketItems::where('basket_id', $basket->id)
             ->where('product_id', $productId)
             ->first();
