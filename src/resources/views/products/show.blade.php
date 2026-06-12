@@ -57,6 +57,17 @@
                 @endif
             </div>
             <div class="product-actions">
+                <div class="product-sizes">
+                    <label>SIZE:</label>
+                    <div class="sizes-list">
+                        @foreach($product->sizes as $s)
+                            @php $isAvailable = $s->quantity > 0; @endphp
+                            <button type="button" class="size-option {{ $isAvailable ? '' : 'unavailable' }}" data-size-id="{{ $s->id }}">{{ $s->size }}</button>
+                        @endforeach
+                        <a href="#" id="sizeGuideLink" class="size-guide">Size Guide</a>
+                    </div>
+                </div>
+
                 <button
                     class="btn btn-primary"
                     id="detailCartBtn"
@@ -77,6 +88,7 @@
             </div>
         </div>
     </section>
+    @include('partials.size-guide-modal', ['product' => $product])
 @endsection
 
 @push('scripts')
@@ -190,7 +202,27 @@
         if (cartBtn) {
             const productId = cartBtn.dataset.productId;
             const isAuthenticated = @json(auth()->check());
-            
+            let selectedSizeId = null;
+
+            document.querySelectorAll('.size-option').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.size-option').forEach(b => b.classList.remove('is-active'));
+                    btn.classList.add('is-active');
+                    selectedSizeId = btn.dataset.sizeId;
+                });
+            });
+
+            // open size guide modal
+            const sizeGuideModal = document.getElementById('sizeGuideModal');
+            const sizeGuideLink = document.getElementById('sizeGuideLink');
+            if (sizeGuideLink && sizeGuideModal) {
+                sizeGuideLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    sizeGuideModal.style.display = 'block';
+                });
+                sizeGuideModal.querySelectorAll('[data-modal-close]').forEach(el => el.addEventListener('click', () => sizeGuideModal.style.display = 'none'));
+            }
+
             const updateCartState = (added) => {
                 cartBtn.textContent = added ? 'In cart' : 'Add to cart';
                 cartBtn.classList.toggle('btn-ghost', added);
@@ -223,9 +255,10 @@
 
                 cartBtn.disabled = true;
                 
-                // Add product to cart
+                // Add product to cart (include selected size if any)
                 const formData = new FormData();
                 formData.append('product_id', productId);
+                if (selectedSizeId) formData.append('product_size_id', selectedSizeId);
                 formData.append('_token', '{{ csrf_token() }}');
 
                 fetch('{{ route("basket.store") }}', {

@@ -110,7 +110,6 @@ class ProductService
 
     public function delete(int $id): bool
     {
-        $id = (int)$id;
         $product = Product::findOrFail($id);
 
         foreach ($product->images as $image) {
@@ -193,6 +192,10 @@ class ProductService
                 isset($params['min_price']) ? (float)$params['min_price'] : 0,
                 isset($params['max_price']) ? (float)$params['max_price'] : null
             ];
+        }
+
+        if (!empty($params['new_collection'])) {
+            $filters['new_collection'] = true;
         }
 
         return $filters;
