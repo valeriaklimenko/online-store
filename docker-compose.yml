@@ -5,9 +5,9 @@ services:
     build:
       context: ./contaners/nginx
       dockerfile: Dockerfile
-    container_name: nginx
+    container_name: klavera-nginx
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
       - ./src:/var/www/html
       - ./logs/nginx:/var/log/nginx
@@ -20,8 +20,8 @@ services:
     build:
       context: ./contaners/fpm
       dockerfile: Dockerfile
-    container_name: php
-    restart: always
+    container_name: klavera-php
+    restart: no
     volumes:
       - ./src:/var/www/html
     expose:
@@ -33,16 +33,25 @@ services:
 
   postgres:
     image: postgres:16
-    container_name: my_postgres
-    restart: always
+    container_name: klavera-my_postgres
+    restart: no
     environment:
-      POSTGRES_DB: php_docker
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: ${POSTGRES_DB:-php_docker}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mysecretpassword}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  mailhog:
+    image: mailhog/mailhog:latest #используем официальный образ
+    container_name: klavera-mailhog
+    ports:
+      - "127.0.0.1:1025:1025"  # SMTP
+      - "127.0.0.1:8025:8025"  # web-interface
     networks:
       - app-network
 

@@ -2,25 +2,37 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\VerifyEmailQueued;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
+
+    protected $casts = [
+        'email',
+        'new_email',
+    ];
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'new_email',
+        'email_change_token',
+        'email_change_requested_at',
     ];
 
     /**
@@ -30,7 +42,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
@@ -42,7 +53,40 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'email_change_requested_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmailQueued());
+    }
+
+    /**
+     * Get the email address for mail notifications.
+     * Override to support sending to new_email for email change verification.
+     */
+    public function routeNotificationForMail($notification)
+    {
+        if ($notification instanceof \App\Notifications\VerifyEmailChangeNotification && $this->new_email) {
+            return $this->new_email;
+        }
+
+        return $this->email;
+    }
+
+    public function basket(): HasOne
+    {
+        return $this->hasOne(Basket::class);
+    }
+
+    public function favorites():HasOne
+    {
+        return $this->hasOne(Favorites::class);
     }
 }

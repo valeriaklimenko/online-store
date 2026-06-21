@@ -1,0 +1,1098 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #ffffff;
+    --bg-cream: #f9f7f2;
+    --text: #1a1a1a;
+    --text-muted: #5c5c5c;
+    --line: #e8e4dc;
+    --line-dark: #1a1a1a;
+    --accent: #2f4a3e;
+    --accent-hover: #243b31;
+    --serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    --sans: 'Jost', 'Inter', system-ui, sans-serif;
+    --header-h: 72px;
+    --container: min(1440px, 100%);
+    --gutter: clamp(1rem, 3vw, 2.5rem);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body.klavera-body {
+    margin: 0;
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+    height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.klavera-shell {
+    width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+}
+
+.klavera-header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: var(--bg);
+    border-bottom: 1px solid transparent;
+}
+
+.klavera-header.is-scrolled {
+    border-bottom-color: var(--line);
+}
+
+.klavera-header__inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    min-height: var(--header-h);
+    gap: 1rem;
+}
+
+.klavera-nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.75rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.klavera-nav--left {
+    justify-content: flex-start;
+}
+
+.klavera-nav--right {
+    justify-content: flex-end;
+    gap: 1.25rem;
+}
+
+.klavera-nav__link {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text);
+    position: relative;
+    transition: opacity 0.2s ease;
+}
+
+.klavera-nav__link:hover,
+.klavera-nav__link.is-active {
+    opacity: 0.65;
+}
+
+.klavera-nav__link.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 1px;
+    background: var(--text);
+}
+
+.klavera-nav__item {
+    position: relative;
+}
+
+.klavera-logo {
+    font-family: var(--serif);
+    font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+    font-weight: 400;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.klavera-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text);
+    position: relative;
+}
+
+.klavera-icon-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.25;
+}
+
+.klavera-cart-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 50%;
+    background: var(--text);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.klavera-mega {
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin-top: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.04);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 150;
+}
+
+.klavera-nav__item:hover .klavera-mega,
+.klavera-nav__item:focus-within .klavera-mega {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.klavera-mega__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    min-height: 320px;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+}
+
+.klavera-mega__inner {
+    max-width: 1440px;
+    margin-inline: auto;
+    padding: clamp(1.75rem, 4vw, 2.6rem) var(--gutter) clamp(2.4rem, 6vw, 4rem);
+}
+
+.klavera-mega__roots {
+    list-style: none;
+    margin: 1.05rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    width: min(340px, 100%);
+}
+
+.klavera-mega__item--root {
+    border-bottom: none;
+}
+
+.klavera-mega__item-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 30px;
+    padding-left: calc(var(--category-level, 0) * 0.95rem);
+}
+
+.klavera-mega__item-link {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+    text-transform: capitalize;
+    padding: 0.22rem 0;
+    transition: opacity 0.2s ease;
+}
+
+.klavera-mega__item-link:hover,
+.klavera-mega__item-link.is-active {
+    opacity: 0.55;
+}
+
+.klavera-mega__toggle {
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.klavera-mega__toggle svg {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+}
+
+.klavera-mega__item.is-open > .klavera-mega__item-row .klavera-mega__toggle svg {
+    transform: rotate(180deg);
+}
+
+.klavera-mega__children {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0.08rem 0 0.28rem;
+}
+
+.klavera-mega__item.is-open > .klavera-mega__children {
+    display: block;
+}
+
+.klavera-mega__empty {
+    font-size: 0.85rem;
+    opacity: 0.6;
+}
+
+.klavera-mega__col {
+    padding: 2rem 2.25rem;
+    border-right: 1px solid var(--line);
+}
+
+.klavera-mega__col:last-child {
+    border-right: none;
+}
+
+.klavera-mega__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.2rem, 2vw, 1.45rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.klavera-mega__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.klavera-mega__list a {
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: capitalize;
+    transition: opacity 0.2s ease;
+}
+
+.klavera-mega__list a:hover {
+    opacity: 0.55;
+}
+
+.klavera-hero {
+    position: relative;
+    width: 100%;
+    min-height: clamp(420px, 72vh, 780px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background-color: #d4cfc6;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+.klavera-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.05) 55%, transparent 100%);
+    pointer-events: none;
+}
+
+.klavera-hero__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: #fff;
+    padding: clamp(2rem, 6vw, 4rem) var(--gutter) clamp(3rem, 8vw, 5rem);
+    max-width: 900px;
+}
+
+.klavera-hero__title {
+    font-family: var(--serif);
+    font-size: clamp(1.75rem, 4.5vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1.15;
+    margin: 0 0 1.5rem;
+    letter-spacing: 0.02em;
+}
+
+.klavera-hero__cta {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #fff;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: opacity 0.2s ease;
+}
+
+.klavera-hero__cta:hover {
+    opacity: 0.75;
+}
+
+.klavera-hero--placeholder {
+    background: linear-gradient(135deg, #e8e4dc 0%, #c9c4ba 100%);
+}
+
+.klavera-hero--placeholder .klavera-hero__content {
+    color: var(--text);
+}
+
+.klavera-hero--placeholder::after {
+    display: none;
+}
+
+.klavera-products {
+    padding: clamp(2.5rem, 5vw, 4rem) 0 clamp(4rem, 8vw, 6rem);
+}
+
+.klavera-products__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.klavera-products__title {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.klavera-products__reset {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--text);
+}
+
+.klavera-filters {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.4fr) repeat(5, minmax(120px, 1fr)) auto;
+    gap: 0.75rem;
+    align-items: end;
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.klavera-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.klavera-filter-field span {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.klavera-filter-field input,
+.klavera-filter-field select {
+    width: 100%;
+    border: 1px solid var(--line-dark);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 42px;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+}
+
+.klavera-filter-submit {
+    min-height: 42px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff;
+    padding: 0 1.25rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.klavera-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+.klavera-card {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.klavera-card__media {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: #f0eeea;
+}
+
+.klavera-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.klavera-card:hover .klavera-card__media img {
+    transform: scale(1.03);
+}
+
+.klavera-card__fav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.klavera-card:hover .klavera-card__fav,
+.klavera-card__fav.is-active {
+    opacity: 1;
+}
+
+.klavera-card__fav svg {
+    width: 16px;
+    height: 16px;
+    fill: transparent;
+    stroke: var(--text);
+    stroke-width: 1.5;
+}
+
+.klavera-card__fav.is-active svg {
+    fill: #c45c4a;
+    stroke: #c45c4a;
+}
+
+.klavera-card__meta {
+    padding-top: 0.85rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 0.5rem;
+    align-items: start;
+}
+
+.klavera-card__name {
+    font-family: var(--serif);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0;
+    grid-column: 1;
+}
+
+.klavera-card__price {
+    font-family: var(--serif);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    grid-column: 2;
+    grid-row: 1;
+    white-space: nowrap;
+}
+
+.klavera-card__variant {
+    grid-column: 1 / -1;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.klavera-card__sizes {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+}
+
+.klavera-card__size {
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    color: var(--text);
+}
+
+.klavera-card__size.is-unavailable {
+    color: var(--text-muted);
+    opacity: 0.55;
+    text-decoration: line-through;
+}
+
+.klavera-card__size-guide {
+    grid-column: 1 / -1;
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: 0.35rem;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    padding: 0.25rem 0 0;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 1px solid currentColor;
+}
+
+.klavera-card__size-guide svg {
+    width: 15px;
+    height: 15px;
+}
+
+.size-guide-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(26, 26, 26, 0.45);
+    z-index: 1000;
+}
+
+.size-guide-modal.active {
+    display: flex;
+}
+
+.size-guide-modal__content {
+    width: min(760px, 100%);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--bg);
+    border: 1px solid var(--line-dark);
+    padding: 1.5rem;
+}
+
+.settings-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.settings-modal-header h2 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.close-modal {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.size-guide-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.size-guide-table th,
+.size-guide-table td {
+    padding: 0.85rem 0.75rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+}
+
+.size-guide-table th {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.klavera-empty {
+    text-align: center;
+    padding: 4rem 1rem;
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    color: var(--text-muted);
+}
+
+.klavera-footer {
+    background: var(--bg-cream);
+    padding: clamp(3rem, 6vw, 5rem) 0 2rem;
+    margin-top: auto;
+}
+
+.klavera-footer__logo {
+    text-align: center;
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.klavera-footer__grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.klavera-footer__col h3 {
+    font-family: var(--serif);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0 0 1rem;
+}
+
+.klavera-footer__col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.klavera-footer__col a {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease;
+}
+
+.klavera-footer__col a:hover {
+    opacity: 0.55;
+}
+
+.klavera-footer__newsletter {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 0.35rem;
+}
+
+.klavera-footer__newsletter input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    padding: 0;
+    outline: none;
+}
+
+.klavera-footer__newsletter input::placeholder {
+    color: var(--text-muted);
+}
+
+.klavera-footer__newsletter button {
+    border: none;
+    background: none;
+    font-family: var(--serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0;
+}
+
+.klavera-footer__bottom {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.5rem;
+}
+
+.klavera-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    pointer-events: none;
+}
+
+.klavera-panel.is-open {
+    pointer-events: auto;
+}
+
+.klavera-panel__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.klavera-panel.is-open .klavera-panel__backdrop {
+    opacity: 1;
+}
+
+.klavera-panel__sheet {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: min(420px, 100%);
+    height: 100%;
+    background: var(--bg);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.08);
+    transform: translateX(100%);
+    transition: transform 0.35s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.klavera-panel--search .klavera-panel__sheet {
+    width: 100%;
+    right: auto;
+    left: 0;
+    transform: translateY(-100%);
+    box-shadow: none;
+    border-bottom: 1px solid var(--line);
+}
+
+.klavera-panel.is-open .klavera-panel__sheet {
+    transform: translate(0);
+}
+
+.klavera-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem var(--gutter);
+    border-bottom: 1px solid var(--line-dark);
+    min-height: var(--header-h);
+}
+
+.klavera-panel__title {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+.klavera-panel__close {
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: var(--text);
+}
+
+.klavera-panel__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem var(--gutter);
+}
+
+.klavera-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem var(--gutter);
+    border-bottom: 1px solid var(--line);
+}
+
+.klavera-search-bar input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid var(--text);
+    background: transparent;
+    font-size: 1rem;
+    padding: 0.5rem 0;
+    outline: none;
+    letter-spacing: 0.04em;
+}
+
+.klavera-search-trending h2 {
+    font-family: var(--serif);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0 0 1.25rem;
+}
+
+.klavera-search-trending ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.klavera-search-trending li + li {
+    margin-top: 0.75rem;
+}
+
+.klavera-search-trending a {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+}
+
+.klavera-account__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin: 0 0 0.5rem;
+    font-weight: 400;
+}
+
+.klavera-account__sub {
+    color: var(--text-muted);
+    margin: 0 0 2rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
+.klavera-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: 1px solid var(--text);
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    text-decoration: none;
+}
+
+.klavera-btn:hover {
+    background: var(--accent-hover);
+}
+
+.klavera-btn--outline {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--text);
+    margin-top: 0.75rem;
+}
+
+.klavera-btn--outline:hover {
+    background: var(--bg-cream);
+}
+
+.klavera-cart-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    text-align: center;
+    gap: 1.5rem;
+}
+
+.klavera-cart-empty p {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    margin: 0;
+}
+
+.klavera-pagination {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+}
+
+.klavera-pagination .pagination {
+    display: flex;
+    gap: 0.35rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.klavera-pagination .pagination a,
+.klavera-pagination .pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    border: 1px solid var(--line);
+}
+
+.klavera-pagination .pagination .active span {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+}
+
+@media (max-width: 1200px) {
+    .klavera-filters {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .klavera-filter-submit {
+        grid-column: 1 / -1;
+    }
+
+    .klavera-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .klavera-footer__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .klavera-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .klavera-header__inner {
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+    }
+
+    .klavera-nav--left {
+        display: none;
+    }
+
+    .klavera-mega__inner {
+        grid-template-columns: 1fr;
+    }
+
+    .klavera-logo {
+        grid-column: 1;
+        justify-self: start;
+        text-align: left;
+        letter-spacing: 0.2em;
+    }
+
+    .klavera-nav--right {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .klavera-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .klavera-footer__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .klavera-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .klavera-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 901px) {
+    .klavera-nav--mobile-shop {
+        display: none;
+    }
+}
