@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Http\Filters\ProductFilterBuilder;
 use App\Models\Product;
 use App\Models\ProductImage;
-use App\Models\ProductQuantity;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,18 +23,9 @@ class ProductService
         return DB::transaction(function () use ($data) {
             $images = $data['images'] ?? [];
             unset($data['images']);
-
-            $quantity = $data ['quantity'] ?? 0;
             unset($data['quantity']);
 
             $product = Product::create($data);
-
-            if ($quantity > 0) {
-                ProductQuantity::create([
-                    'product_id' => $product->id,
-                    'quantity' => $quantity,
-                ]);
-            }
 
             $storedImages = [];
             foreach ($images as $image) {
@@ -58,12 +48,11 @@ class ProductService
 
     public function update(int $id, array $data): bool
     {
-        $id = (int)$id;
-
         return DB::transaction(function () use ($id, $data) {
             $product = Product::lockForUpdate()->findOrFail($id);
 
-            $quantity = $data['quantity'] ?? 0;
+            unset($data['quantity']);
+
             $newImages = $data['images'] ?? [];
             $removeImages = $data['remove_images'] ?? [];
             unset($data['images'], $data['remove_images']);
@@ -96,14 +85,6 @@ class ProductService
                 }
             }
 
-            if ($quantity !== null) {
-                $product->productQuantity()->updateOrCreate([
-                    ['product_id' => $id],
-                    ['quantity' => $quantity],
-                ]);
-            }
-
-
             return $product->update($data);
         });
     }
@@ -126,25 +107,14 @@ class ProductService
 
     public function getPaginatedProducts(int $perPage = 15): LengthAwarePaginator
     {
-        return Product::with(['images', 'category'])
+        return Product::with(['images', 'category', 'sizes'])
             ->orderBy('name', 'asc')
             ->paginate($perPage);
     }
 
-    public function getProductWithRelations(string $id): Product
-    {
-        return Product::with(['images', 'category'])->findOrFail($id);
-    }
-
-    public function getProductForEdit(string $id): Product
-    {
-        $id = (int)$id;
-        return Product::with('images')->findOrFail($id);
-    }
-
     public function searchProducts(array $params): LengthAwarePaginator
     {
-        $query = Product::with(['images', 'category']);
+        $query = Product::with(['images', 'category', 'sizes']);
 
         $filters = $this->prepareFilters($params);
         $query = $this->filterBuilder->apply($query, $filters);
@@ -203,7 +173,7 @@ class ProductService
 
     public function buildSearchQuery(?string $searchQuery): Builder
     {
-        $query = Product::with(['images', 'category']);
+        $query = Product::with(['images', 'category', 'sizes']);
 
         if ($searchQuery) {
             $searchQueryLower = mb_strtolower($searchQuery);
@@ -220,7 +190,7 @@ class ProductService
     {
         $limit = (int)$limit;
         $queryLower = mb_strtolower($query);
-        return Product::with(['images', 'category'])
+        return Product::with(['images', 'category', 'sizes'])
             ->whereRaw('LOWER(name) LIKE ?', ['%' . $queryLower . '%'])
             ->orderBy('name', 'asc')
             ->limit($limit)
@@ -231,7 +201,7 @@ class ProductService
     {
         $limit = (int)$limit;
         $queryLower = mb_strtolower($query);
-        return Product::with(['images', 'category'])
+        return Product::with(['images', 'category', 'sizes'])
             ->where(function (Builder $q) use ($queryLower) {
                 $q->whereRaw('LOWER(name) LIKE ?', ['%' . $queryLower . '%'])
                     ->orWhereRaw('LOWER(description) LIKE ?', ['%' . $queryLower . '%']);
@@ -266,5 +236,25 @@ class ProductService
             return null;
         }
         return $product->image ?? optional($product->images->first())->path;
+    }
+
+    public function updateWithSizes(int $id, array $data): void
+    {
+        DB::transaction(function () use ($id, $data) {
+            $sizeQuantities = $data['size_quantities'] ?? [];
+            unset($data['size_quantities']);
+            unset($data['quantity']);
+
+            $product = Product::findOrFail($id);
+            $product->update($data);
+
+            if (!empty($sizeQuantities)) {
+                $syncData = [];
+                foreach ($sizeQuantities as $sizeId => $quantity) {
+                    $syncData[$sizeId] = ['quantity' => (int)$quantity];
+                }
+                $product->sizes()->sync($syncData);
+            }
+        });
     }
 }

@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Hash;
 
 class ManagerService
 {
-
-//    public function store(array $data): User
-//    {
-//        return $this->createService->createManager($data);
-//    }
     public function getAllManagers(): Collection
     {
         return User::role(Roles::MANAGER->value)->latest()->get();

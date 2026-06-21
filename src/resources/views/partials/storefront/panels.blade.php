@@ -1,8 +1,22 @@
 @php
+    use App\Enums\RoleSystem\Roles;
+
     $panelBasketCount = 0;
+    $panelUser = auth()->user();
+    $panelProfileRoute = route('profile');
+    $panelProfileLabel = 'My profile';
+
     if (auth()->check()) {
         $panelBasket = \App\Models\Basket::where('user_id', auth()->id())->first();
         $panelBasketCount = $panelBasket ? $panelBasket->items()->count() : 0;
+
+        if ($panelUser?->hasRole(Roles::ADMIN->value)) {
+            $panelProfileRoute = route('admin.profile');
+            $panelProfileLabel = 'Admin profile';
+        } elseif ($panelUser?->hasRole(Roles::MANAGER->value)) {
+            $panelProfileRoute = route('manager.profile');
+            $panelProfileLabel = 'Manager profile';
+        }
     }
 @endphp
 
@@ -11,9 +25,12 @@
     <div class="klavera-panel__sheet">
         <div class="klavera-search-bar">
             <button type="button" class="klavera-icon-btn" data-close-panel aria-label="Back">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
             </button>
-            <input type="search" id="panelSearchInput" placeholder="Search" value="{{ request('query') }}" autocomplete="off">
+            <input type="search" id="panelSearchInput" placeholder="Search" value="{{ request('query') }}"
+                   autocomplete="off">
             <button type="button" class="klavera-panel__close" data-close-panel aria-label="Close">&times;</button>
         </div>
         <div class="klavera-panel__body">
@@ -41,8 +58,8 @@
             <h2 class="klavera-account__heading">Sign in to your account</h2>
             <p class="klavera-account__sub">Get access to your orders, favorites, and more.</p>
             @auth
-                <a href="{{ route('profile') }}" class="klavera-btn">My profile</a>
-                <a href="{{ route('orders.index') }}" class="klavera-btn klavera-btn--outline">My orders</a>
+                <a href="{{ $panelProfileRoute }}" class="klavera-btn">{{ $panelProfileLabel }}</a>
+                {{--                <a href="{{ route('orders.index') }}" class="klavera-btn klavera-btn--outline">My orders</a>--}}
             @else
                 <a href="{{ route('loginForm') }}" class="klavera-btn">Sign in or sign up</a>
                 <a href="{{ route('registerForm') }}" class="klavera-btn klavera-btn--outline">Create account</a>
@@ -65,7 +82,8 @@
             @else
                 <div class="klavera-cart-empty">
                     <p>Your basket is empty</p>
-                    <a href="{{ route('home') }}#products" class="klavera-btn klavera-btn--outline" data-close-panel>Continue shopping</a>
+                    <a href="{{ route('home') }}#products" class="klavera-btn klavera-btn--outline" data-close-panel>Continue
+                        shopping</a>
                 </div>
             @endif
         </div>

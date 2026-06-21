@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Basket;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BasketStoreRequest extends FormRequest
+class BannerUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,9 @@ class BasketStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'required|exists:products,id',
-            'size_id'     => 'required|exists:clothes_sizes,id',
-            'quantity'    => 'required|integer|min:1',
+            'title' => 'required|string|max:255',
+            'image' => 'nullable|image',
+
         ];
     }
 }

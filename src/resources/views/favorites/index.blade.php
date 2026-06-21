@@ -46,21 +46,22 @@
                         @if($item->product->category)
                             <span class="badge">{{ $item->product->category->name }}</span>
                         @endif
-                        <p class="line-item__price" style="margin-top: 0.75rem;">${{ number_format($item->product->price, 2) }}</p>
+                        <p class="line-item__price" style="margin-top: 0.75rem;">
+                            ${{ number_format($item->product->price, 2) }}</p>
                     </div>
 
                     <div class="line-item__actions">
-                        <form action="{{ route('basket.store') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $item->product->id }}">
-                            <button type="submit" class="btn btn-primary btn-small">Add to basket</button>
-                        </form>
+                        <button type="button" class="btn btn-primary btn-small js-open-size-picker"
+                                data-product-id="{{ $item->product->id }}"
+                                data-product-name="{{ $item->product->name }}"
+                                data-sizes='@json($item->product->sizes->map(fn($s) => ["id" => $s->id, "name" => $s->name, "stock" => ($s->pivot->quantity ?? 0)]))'>
+                            Add to basket
+                        </button>
                         <form action="{{ route('favorites.destroy', $item->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-small"
-                                    onclick="return confirm('Remove from favorites?')">
-                                Remove
+                                    onclick="return confirm('Remove from favorites?')">Remove
                             </button>
                         </form>
                     </div>
@@ -72,4 +73,110 @@
             <a href="{{ route('home') }}#products" class="btn btn-ghost">Continue shopping</a>
         </p>
     @endif
+
+    @include('partials.size-picker-modal')
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('sizePickerModal');
+            const list = document.getElementById('sizePickerList');
+            const productIdInput = document.getElementById('sizePickerProductId');
+            const sizeIdInput = document.getElementById('sizePickerSizeId');
+            const submitBtn = document.getElementById('sizePickerSubmit');
+            const nameEl = document.getElementById('sizePickerProductName');
+            const form = document.getElementById('sizePickerForm');
+            const warning = document.getElementById('sizePickerWarning');
+            let selectedSizeId = null;
+
+            const openModal = (btn) => {
+                selectedSizeId = null;
+                sizeIdInput.value = '';
+                submitBtn.disabled = true;
+                warning.hidden = true;
+                warning.textContent = '';
+                list.innerHTML = '';
+
+                const sizes = JSON.parse(btn.dataset.sizes || '[]');
+                productIdInput.value = btn.dataset.productId;
+                nameEl.textContent = btn.dataset.productName;
+
+                sizes.forEach((size) => {
+                    const available = size.stock > 0;
+                    const el = document.createElement('button');
+                    el.type = 'button';
+                    el.className = 'size-option' + (available ? '' : ' unavailable');
+                    el.textContent = size.name;
+                    el.dataset.sizeId = size.id;
+                    el.disabled = !available;
+
+                    if (available) {
+                        el.addEventListener('click', () => {
+                            list.querySelectorAll('.size-option').forEach(b => b.classList.remove('is-active'));
+                            el.classList.add('is-active');
+                            selectedSizeId = size.id;
+                            sizeIdInput.value = size.id;
+                            warning.hidden = true;
+                            submitBtn.disabled = false;
+                        });
+                    }
+
+                    list.appendChild(el);
+                });
+
+                modal.classList.add('active');
+            };
+
+            const closeModal = () => modal.classList.remove('active');
+
+            document.querySelectorAll('.js-open-size-picker').forEach(btn => {
+                btn.addEventListener('click', () => openModal(btn));
+            });
+
+            modal.querySelectorAll('[data-size-modal-close]').forEach(el => {
+                el.addEventListener('click', closeModal);
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            form?.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                if (!selectedSizeId) {
+                    warning.textContent = 'Please select a size before adding this item to your basket.';
+                    warning.hidden = false;
+                    return;
+                }
+
+                submitBtn.disabled = true;
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'},
+                })
+                    .then(async response => {
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) throw new Error(data.message || 'Could not add this item to your basket. Please try again.');
+                        return data;
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = '{{ route('basket.index') }}';
+                            return;
+                        }
+
+                        throw new Error(data.message || 'Could not add this item to your basket. Please try again.');
+                    })
+                    .catch(error => {
+                        warning.textContent = error.message || 'Could not add this item to your basket. Please try again.';
+                        warning.hidden = false;
+                        submitBtn.disabled = false;
+                    });
+            });
+        });
+    </script>
+@endpush

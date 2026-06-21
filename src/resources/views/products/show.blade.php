@@ -3,40 +3,25 @@
 @section('title', $product->name . ' — Klavera')
 
 @section('content')
-    <a href="{{ url('/#products') }}" class="btn btn-ghost" style="margin-bottom: 1.5rem;">← Back to catalog</a>
+    <a href="{{ route('home') }}#products" class="btn btn-ghost" style="margin-bottom: 1.5rem;">← Back to catalog</a>
 
     <section class="card product-detail">
         <div>
             @if($galleryUrls->isNotEmpty())
-                <div
-                    class="media-slider"
-                    data-images='@json($galleryUrls, JSON_UNESCAPED_SLASHES)'
-                >
-                    <img
-                        src="{{ $galleryUrls->first() }}"
-                        alt="{{ $product->name }}"
-                        data-media-image
-                    >
-                    <button
-                        class="media-nav media-nav--prev"
-                        type="button"
-                        aria-label="Previous photo"
-                        data-media-prev
-                        @if($galleryUrls->count() <= 1) hidden @endif
-                    >
+                <div class="media-slider" data-images='@json($galleryUrls, JSON_UNESCAPED_SLASHES)'>
+                    <img src="{{ $galleryUrls->first() }}" alt="{{ $product->name }}" data-media-image>
+                    <button class="media-nav media-nav--prev" type="button" aria-label="Previous photo" data-media-prev
+                            @if($galleryUrls->count() <= 1) hidden @endif>
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6"/>
+                            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                  stroke-linejoin="round" d="M15 6l-6 6 6 6"/>
                         </svg>
                     </button>
-                    <button
-                        class="media-nav media-nav--next"
-                        type="button"
-                        aria-label="Next photo"
-                        data-media-next
-                        @if($galleryUrls->count() <= 1) hidden @endif
-                    >
+                    <button class="media-nav media-nav--next" type="button" aria-label="Next photo" data-media-next
+                            @if($galleryUrls->count() <= 1) hidden @endif>
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/>
+                            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                  stroke-linejoin="round" d="M9 6l6 6-6 6"/>
                         </svg>
                     </button>
                 </div>
@@ -61,276 +46,175 @@
                     <label>SIZE:</label>
                     <div class="sizes-list">
                         @foreach($product->sizes as $s)
-                            @php $isAvailable = $s->quantity > 0; @endphp
-                            <button type="button" class="size-option {{ $isAvailable ? '' : 'unavailable' }}" data-size-id="{{ $s->id }}">{{ $s->size }}</button>
+                            @php $isAvailable = ($s->pivot->quantity ?? 0) > 0; @endphp
+                            <button type="button"
+                                    class="size-option {{ $isAvailable ? '' : 'unavailable' }}"
+                                    data-size-id="{{ $s->id }}"
+                                @disabled(!$isAvailable)>
+                                {{ $s->name }}
+                            </button>
                         @endforeach
                         <a href="#" id="sizeGuideLink" class="size-guide">Size Guide</a>
                     </div>
+                    <p class="product-inline-warning" id="sizeWarning" hidden>Please select a size before adding this
+                        item to your basket.</p>
                 </div>
 
-                <button
-                    class="btn btn-primary"
-                    id="detailCartBtn"
-                    data-product-id="{{ $product->id }}"
-                >
+                <button class="btn btn-primary" id="detailCartBtn" data-product-id="{{ $product->id }}">
                     Add to Cart
                 </button>
-                <button
-                    class="favorite-toggle"
-                    id="detailFavoriteBtn"
-                    aria-label="Add to favorites"
-                    data-product-id="{{ $product->id }}"
-                >
+                <button class="favorite-toggle" id="detailFavoriteBtn" aria-label="Add to favorites"
+                        data-product-id="{{ $product->id }}">
                     <svg viewBox="0 0 24 24">
-                        <path d="M12 20.5s-6.2-3.9-8.5-7.2c-1.6-2.3-1.7-5.3 0.2-7.1a4.3 4.3 0 0 1 5.8.3l2.5 2.5 2.5-2.5a4.3 4.3 0 0 1 5.8-.3c1.9 1.8 1.8 4.8 0.2 7.1-2.3 3.3-8.5 7.2-8.5 7.2z"/>
+                        <path
+                            d="M12 20.5s-6.2-3.9-8.5-7.2c-1.6-2.3-1.7-5.3 0.2-7.1a4.3 4.3 0 0 1 5.8.3l2.5 2.5 2.5-2.5a4.3 4.3 0 0 1 5.8-.3c1.9 1.8 1.8 4.8 0.2 7.1-2.3 3.3-8.5 7.2-8.5 7.2z"/>
                     </svg>
                 </button>
             </div>
         </div>
     </section>
-    @include('partials.size-guide-modal', ['product' => $product])
+
+    @include('partials.size-guide-modal')
 @endsection
 
 @push('scripts')
     <script>
-        const favoriteStorageKey = 'klavera:favorites';
-        const cartStorageKey = 'klavera:cart';
-
-        const parseStoredSet = (key) => {
-            try {
-                return new Set(JSON.parse(localStorage.getItem(key) || '[]'));
-            } catch (error) {
-                console.warn('Storage parse error', error);
-                return new Set();
-            }
-        };
-
-        const persistSet = (key, set) => {
-            localStorage.setItem(key, JSON.stringify([...set]));
-        };
-
-        const favorites = parseStoredSet(favoriteStorageKey);
-        const cartItems = parseStoredSet(cartStorageKey);
-
-        const favoriteBtn = document.getElementById('detailFavoriteBtn');
-        const cartBtn = document.getElementById('detailCartBtn');
-        const isAuthenticated = @json(auth()->check());
-
-        if (favoriteBtn) {
-            const productId = favoriteBtn.dataset.productId;
-            
-            // Check favorites state on page load
-            if (isAuthenticated) {
-                fetch('{{ route("favorites.index") }}')
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const productLink = doc.querySelector(`a[href*="/products/${productId}"]`);
-                        if (productLink && productLink.closest('.card')) {
-                            favoriteBtn.classList.add('is-active');
-                        }
-                    })
-                    .catch(() => {});
-            }
-
-            favoriteBtn.addEventListener('click', () => {
-                // Check authentication
-                if (!isAuthenticated) {
-                    alert('To add product to favorites, please login');
-                    window.location.href = '{{ route("loginForm") }}';
-                    return;
-                }
-
-                const isActive = favoriteBtn.classList.contains('is-active');
-                favoriteBtn.disabled = true;
-
-                if (isActive) {
-                    // Remove from favorites
-                    const formData = new FormData();
-                    formData.append('product_id', productId);
-                    formData.append('_token', '{{ csrf_token() }}');
-
-                    fetch('{{ route("favorites.removeByProduct") }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            favoriteBtn.classList.remove('is-active');
-                        }
-                        favoriteBtn.disabled = false;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        favoriteBtn.disabled = false;
-                    });
-                } else {
-                    // Add to favorites
-                    const formData = new FormData();
-                    formData.append('product_id', productId);
-                    formData.append('_token', '{{ csrf_token() }}');
-
-                    fetch('{{ route("favorites.store") }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            favoriteBtn.classList.add('is-active');
-                        }
-                        favoriteBtn.disabled = false;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        favoriteBtn.disabled = false;
-                    });
-                }
-            });
-        }
-
-        if (cartBtn) {
-            const productId = cartBtn.dataset.productId;
+        document.addEventListener('DOMContentLoaded', () => {
             const isAuthenticated = @json(auth()->check());
-            let selectedSizeId = null;
+            const favoriteBtn = document.getElementById('detailFavoriteBtn');
+            const cartBtn = document.getElementById('detailCartBtn');
 
-            document.querySelectorAll('.size-option').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.size-option').forEach(b => b.classList.remove('is-active'));
-                    btn.classList.add('is-active');
-                    selectedSizeId = btn.dataset.sizeId;
-                });
-            });
+            if (favoriteBtn) {
+                const productId = favoriteBtn.dataset.productId;
 
-            // open size guide modal
-            const sizeGuideModal = document.getElementById('sizeGuideModal');
-            const sizeGuideLink = document.getElementById('sizeGuideLink');
-            if (sizeGuideLink && sizeGuideModal) {
-                sizeGuideLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    sizeGuideModal.style.display = 'block';
-                });
-                sizeGuideModal.querySelectorAll('[data-modal-close]').forEach(el => el.addEventListener('click', () => sizeGuideModal.style.display = 'none'));
-            }
-
-            const updateCartState = (added) => {
-                cartBtn.textContent = added ? 'In cart' : 'Add to cart';
-                cartBtn.classList.toggle('btn-ghost', added);
-                cartBtn.disabled = false;
-            };
-
-            // Check cart state on page load
-            if (isAuthenticated) {
-                fetch('{{ route("basket.index") }}')
-                    .then(response => response.text())
-                    .then(html => {
-                        // Check if product exists in cart HTML
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const productLink = doc.querySelector(`a[href*="/products/${productId}"]`);
-                        if (productLink && productLink.closest('.card')) {
-                            updateCartState(true);
-                        }
-                    })
-                    .catch(() => {});
-            }
-
-            cartBtn.addEventListener('click', () => {
-                // Check authentication
-                if (!isAuthenticated) {
-                    alert('Please log in to add products to cart');
-                    window.location.href = '{{ route("loginForm") }}';
-                    return;
+                if (isAuthenticated) {
+                    fetch('{{ route("favorites.index") }}')
+                        .then(r => r.text())
+                        .then(html => {
+                            const doc = new DOMParser().parseFromString(html, 'text/html');
+                            if (doc.querySelector(`a[href*="/products/${productId}"]`)) {
+                                favoriteBtn.classList.add('is-active');
+                            }
+                        })
+                        .catch(() => {
+                        });
                 }
 
-                cartBtn.disabled = true;
-                
-                // Add product to cart (include selected size if any)
-                const formData = new FormData();
-                formData.append('product_id', productId);
-                if (selectedSizeId) formData.append('product_size_id', selectedSizeId);
-                formData.append('_token', '{{ csrf_token() }}');
-
-                fetch('{{ route("basket.store") }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                })
-                .then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                    } else {
-                        return response.json().catch(() => ({}));
+                favoriteBtn.addEventListener('click', () => {
+                    if (!isAuthenticated) {
+                        window.location.href = '{{ route("loginForm") }}';
+                        return;
                     }
-                })
-                .then(() => {
-                    updateCartState(true);
-                    // Reload page to sync with server
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 500);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    cartBtn.disabled = false;
-                    alert('An error occurred while adding product to cart');
+
+                    const isActive = favoriteBtn.classList.contains('is-active');
+                    favoriteBtn.disabled = true;
+                    const formData = new FormData();
+                    formData.append('product_id', productId);
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    fetch(isActive ? '{{ route("favorites.removeByProduct") }}' : '{{ route("favorites.store") }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'},
+                    })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) favoriteBtn.classList.toggle('is-active', !isActive);
+                            favoriteBtn.disabled = false;
+                        })
+                        .catch(() => {
+                            favoriteBtn.disabled = false;
+                        });
                 });
-            });
-        }
-
-        document.querySelectorAll('.media-slider').forEach((slider) => {
-            const rawImages = slider.dataset.images || '[]';
-            let images = [];
-            try {
-                images = JSON.parse(rawImages);
-            } catch (error) {
-                console.warn('Slider data parse error', error);
             }
 
-            if (!images.length) {
-                return;
-            }
+            if (cartBtn) {
+                const productId = cartBtn.dataset.productId;
+                let selectedSizeId = null;
 
-            const imageEl = slider.querySelector('[data-media-image]');
-            const prevBtn = slider.querySelector('[data-media-prev]');
-            const nextBtn = slider.querySelector('[data-media-next]');
-            let currentIndex = 0;
+                document.querySelectorAll('.size-option').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.size-option').forEach(b => b.classList.remove('is-active'));
+                        btn.classList.add('is-active');
+                        selectedSizeId = btn.dataset.sizeId;
+                        document.getElementById('sizeWarning')?.setAttribute('hidden', 'hidden');
+                    });
+                });
 
-            const updateImage = () => {
-                if (!imageEl) {
-                    return;
+                const sizeGuideModal = document.getElementById('sizeGuideModal');
+                const sizeGuideLink = document.getElementById('sizeGuideLink');
+                if (sizeGuideLink && sizeGuideModal) {
+                    sizeGuideLink.addEventListener('click', e => {
+                        e.preventDefault();
+                        sizeGuideModal.classList.add('active');
+                    });
+                    sizeGuideModal.querySelectorAll('[data-modal-close]').forEach(el => {
+                        el.addEventListener('click', () => sizeGuideModal.classList.remove('active'));
+                    });
                 }
-                imageEl.src = images[currentIndex];
-            };
 
-            if (images.length <= 1) {
-                prevBtn?.setAttribute('hidden', 'true');
-                nextBtn?.setAttribute('hidden', 'true');
-                return;
+                cartBtn.addEventListener('click', () => {
+                    if (!isAuthenticated) {
+                        window.location.href = '{{ route("loginForm") }}';
+                        return;
+                    }
+                    if (!selectedSizeId) {
+                        const warning = document.getElementById('sizeWarning');
+                        warning?.removeAttribute('hidden');
+                        warning?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+                        return;
+                    }
+
+                    cartBtn.disabled = true;
+                    const formData = new FormData();
+                    formData.append('product_id', productId);
+                    formData.append('size_id', selectedSizeId);
+                    formData.append('quantity', '1');
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    fetch('{{ route("basket.store") }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'},
+                    })
+                        .then(async r => {
+                            const data = await r.json().catch(() => ({}));
+                            if (!r.ok) throw new Error(data.message || 'Failed to add to cart');
+                            return data;
+                        })
+                        .then(data => {
+                            if (data.success) window.location.href = '{{ route("basket.index") }}';
+                        })
+                        .catch(err => {
+                            const warning = document.getElementById('sizeWarning');
+                            if (warning) {
+                                warning.textContent = err.message || 'Could not add this item to your basket. Please try again.';
+                                warning.removeAttribute('hidden');
+                            }
+                            cartBtn.disabled = false;
+                        });
+                });
             }
 
-            prevBtn?.addEventListener('click', () => {
-                currentIndex = (currentIndex - 1 + images.length) % images.length;
-                updateImage();
-            });
+            document.querySelectorAll('.media-slider').forEach(slider => {
+                let images = [];
+                try {
+                    images = JSON.parse(slider.dataset.images || '[]');
+                } catch (_) {
+                }
+                if (images.length <= 1) return;
 
-            nextBtn?.addEventListener('click', () => {
-                currentIndex = (currentIndex + 1) % images.length;
-                updateImage();
+                const imageEl = slider.querySelector('[data-media-image]');
+                let currentIndex = 0;
+                slider.querySelector('[data-media-prev]')?.addEventListener('click', () => {
+                    currentIndex = (currentIndex - 1 + images.length) % images.length;
+                    if (imageEl) imageEl.src = images[currentIndex];
+                });
+                slider.querySelector('[data-media-next]')?.addEventListener('click', () => {
+                    currentIndex = (currentIndex + 1) % images.length;
+                    if (imageEl) imageEl.src = images[currentIndex];
+                });
             });
         });
     </script>
 @endpush
-

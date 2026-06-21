@@ -9,6 +9,7 @@ use App\Http\Requests\Products\ProductUpdateRequest;
 use App\Models\Product;
 use App\Services\CategoryService;
 use App\Services\ProductService;
+use App\Services\ProductSizeService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -26,19 +27,31 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(CategoryService $categoryService): View
+    public function create(CategoryService $categoryService, ProductSizeService $sizeService): View
     {
         $categories = $categoryService->getAllCategories();
-        return view('products.create', compact('categories'));
+        $allSizes = $sizeService->getCreateData();
+
+        return view('products.create', array_merge(compact('categories'), $allSizes));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProductStoreRequest $request, ProductService $productService): RedirectResponse
+    public function store(
+        ProductStoreRequest $request,
+        ProductService      $productService,
+        ProductSizeService  $sizeService
+    ): RedirectResponse
     {
-        $productService->
-        store($request->validated());
+        $validated = $request->validated();
+        $sizeQuantities = $validated['size_quantities'] ?? [];
+        unset($validated['size_quantities']);
+
+        $product = $productService->store($validated);
+
+        $sizeService->syncSizes($product, $sizeQuantities);
+
         return redirect()->route('products.index')
             ->with('success', FlashMessage::PRODUCT_CREATED->value);
     }
@@ -48,19 +61,29 @@ class ProductController extends Controller
      */
     public function show(Product $product, ProductService $productService): View
     {
-        $product->load(['images', 'category']);
+        $product->load(['images', 'category', 'sizes']);
         $galleryUrls = $productService->getGalleryUrls($product);
+
         return view('products.show', compact('product', 'galleryUrls'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product, CategoryService $categoryService): View
+    public function edit(
+        Product            $product,
+        CategoryService    $categoryService,
+        ProductSizeService $sizeService,
+    ): View
     {
-        $product->load('images');
+        $product->load('images', 'sizes');
         $categories = $categoryService->getAllCategories();
-        return view('products.edit', compact('product', 'categories'));
+        $sizeData = $sizeService->getEditData($product);
+
+        return view('products.edit', array_merge(
+            compact('product', 'categories'),
+            $sizeData
+        ));
     }
 
     /**
@@ -68,8 +91,8 @@ class ProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, Product $product, ProductService $productService): RedirectResponse
     {
-        $productId = (int) $product->id;
-        $productService->update($productId, $request->validated());
+        $productService->updateWithSizes($product->id, $request->validated());
+
         return redirect()->route('products.index')
             ->with('success', FlashMessage::PRODUCT_UPDATED->value);
     }
@@ -79,8 +102,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product, ProductService $productService): RedirectResponse
     {
-        $productId = (int) $product->id;
-        $productService->delete($productId);
+        $productService->delete($product->id);
+
         return redirect()->route('products.index')
             ->with('success', FlashMessage::PRODUCT_DELETED->value);
     }

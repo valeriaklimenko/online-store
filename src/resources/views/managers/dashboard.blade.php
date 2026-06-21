@@ -24,11 +24,6 @@
             <a href="{{ route('products.index') }}" class="btn btn-primary">Go to products</a>
         </div>
         <div class="dashboard-tile">
-            <h3>Orders</h3>
-            <p>View and process customer orders.</p>
-            <a href="{{ route('manage.orders.index') }}" class="btn btn-primary">Manage orders</a>
-        </div>
-        <div class="dashboard-tile">
             <h3>New product</h3>
             <p>Quickly add an item to the storefront.</p>
             <a href="{{ route('products.create') }}" class="btn btn-ghost">Add product</a>

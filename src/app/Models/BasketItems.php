@@ -13,6 +13,8 @@ class BasketItems extends Model
     protected $fillable = [
         'basket_id',
         'product_id',
+        'size_id',
+        'quantity',
     ];
 
     public function basket(): BelongsTo
@@ -23,5 +25,10 @@ class BasketItems extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function size(): BelongsTo
+    {
+        return $this->belongsTo(Sizes::class, 'size_id');
     }
 }

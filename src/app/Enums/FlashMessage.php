@@ -18,6 +18,7 @@ enum FlashMessage: string
 
     case BASKET_ADDED = 'Item was successfully added to basket!';
     case BASKET_REMOVED = 'Item was successfully removed from basket';
+    case BASKET_UPDATED = 'Item was successfully updated in basket';
     case BASKET_NOT_ENOUGH_STOCK = 'Not enough stock for this product';
 
     case MANAGER_CREATED = 'Manager created successfully';

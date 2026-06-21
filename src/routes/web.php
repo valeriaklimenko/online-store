@@ -1,16 +1,17 @@
 <?php
 
 use App\Enums\RoleSystem\Roles;
+use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\ManagerController;
+use App\Http\Controllers\Admin\ManagerProfileController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Basket\BasketController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Favorites\FavoritesController;
-use App\Http\Controllers\Managers\ManagerController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Profiles\AccountDeleteController;
-use App\Http\Controllers\Profiles\AdminProfileController;
 use App\Http\Controllers\Profiles\ChangeProfileController;
-use App\Http\Controllers\Profiles\ManagerProfileController;
 use App\Http\Controllers\Profiles\UserProfileController;
 use App\Http\Controllers\Register\RegisterController;
 use App\Http\Controllers\WelcomeController;
@@ -72,6 +73,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/basket', [BasketController::class, 'index'])->name('basket.index');
     Route::post('/basket', [BasketController::class, 'store'])->name('basket.store');
+    Route::put('/basket/{id}', [BasketController::class, 'update'])->name('basket.update');
     Route::delete('/basket/{id}', [BasketController::class, 'destroy'])->name('basket.destroy');
 
     Route::get('/favorites', [FavoritesController::class, 'index'])->name('favorites.index');
@@ -93,6 +95,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:' . Roles::ADMIN->value)->group(function () {
         Route::resource('managers', ManagerController::class)->except(['show', 'edit', 'update']);
         Route::resource('categories', CategoryController::class)->except(['show']);
+        Route::get('/admin/banner', [BannerController::class, 'edit'])->name('admin.banner.edit');
+        Route::post('/admin/banner', [BannerController::class, 'update'])->name('admin.banner.update');
     });
 
     Route::middleware('role:' . Roles::MANAGER->value)->group(function () {

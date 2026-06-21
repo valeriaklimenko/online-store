@@ -39,7 +39,7 @@ class FavoriteService
      */
     public function getFavoritesData(Favorites $favorites): array
     {
-        $items = $favorites->items()->with('product.images', 'product.category')->get();
+        $items = $favorites->items()->with(['product.images', 'product.category', 'product.sizes'])->get();
 
         return [
             'favorites' => $favorites,
@@ -54,16 +54,6 @@ class FavoriteService
     {
         $favorites->items()
             ->where('id', $itemId)
-            ->delete();
-    }
-
-    /**
-     * Remove favorite item by product ID
-     */
-    public function removeItemByProductId(Favorites $favorites, int $productId): void
-    {
-        $favorites->items()
-            ->where('product_id', $productId)
             ->delete();
     }
 

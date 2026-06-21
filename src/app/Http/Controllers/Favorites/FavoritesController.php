@@ -51,6 +51,7 @@ class FavoritesController extends Controller
     {
         $favorites = $favoriteService->getForCurrentUser();
         $favoriteService->removeItemById($favorites, $id);
+
         return redirect()->route('favorites.index')
             ->with('success', FlashMessage::FAVORITES_REMOVED->value);
     }

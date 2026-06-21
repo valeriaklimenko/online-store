@@ -2,105 +2,116 @@
 
 namespace App\Services;
 
+use App\Dto\Basket\AddItemDto;
 use App\Models\Basket;
 use App\Models\BasketItems;
+use App\Trait\ChecksProductStock;
 use Illuminate\Support\Facades\Auth;
 
 class BasketService
 {
-    /**
-     * Calculate total cost of basket items
-     */
-    public function calculateTotal(Basket $basket): float
-    {
-        $total = 0;
+    use ChecksProductStock;
 
-        foreach ($basket->items()->with('product')->get() as $item) {
-            $total += $item->product->price;
+    public function getBasket($user = null): Basket
+    {
+        $user = $user ?? Auth::user();
+
+        if (!$user) {
+            throw new \RuntimeException('User not logged in');
         }
 
-        return round($total, 2);
-    }
-
-    /**
-     * Update basket total price
-     */
-    public function updateTotal(Basket $basket): Basket
-    {
-        $basket->total_price = $this->calculateTotal($basket);
-        $basket->save();
-
-        return $basket;
-    }
-
-    /**
-     * Prepare basket data for view
-     */
-    public function getBasketData(Basket $basket): array
-    {
-        $items = $basket->items()->with('product.images')->get();
-
-        return [
-            'basket' => $basket,
-            'items' => $items,
-            'total_price' => $basket->total_price,
-            'items_count' => $items->count(),
-        ];
-    }
-
-    /**
-     * Get or create basket for user
-     */
-    public function getForUser($user): Basket
-    {
         return Basket::firstOrCreate(
             ['user_id' => $user->id],
             ['total_price' => 0]
         );
     }
 
-    /**
-     * Get or create basket for current authenticated user
-     */
-    public function getForCurrentUser(): Basket
+    public function addItem(Basket $basket, AddItemDto $dto): BasketItems
     {
-        $user = Auth::user();
+        $this->checkStock($dto->productId, $dto->sizeId, $dto->quantity);
 
-        if (!$user) {
-            throw new \RuntimeException('User not authenticated');
-        }
-
-        return $this->getForUser($user);
-    }
-
-    /**
-     * Remove basket item by ID
-     */
-    public function removeItemById(Basket $basket, int $itemId): void
-    {
-        $basket->items()
-            ->where('id', $itemId)
-            ->delete();
-    }
-
-    /**
-     * Add product to basket
-     */
-    public function addItem(Basket $basket, int $productId): BasketItems
-    {
-        $existingItem = BasketItems::where('basket_id', $basket->id)
-            ->where('product_id', $productId)
+        $item = BasketItems::where('basket_id', $basket->id)
+            ->where('product_id', $dto->productId)
+            ->where('size_id', $dto->sizeId)
             ->first();
 
-        if ($existingItem) {
-            return $existingItem->load('product');
+        if ($item) {
+            $item->quantity += $dto->quantity;
+            $item->save();
+        } else {
+            $item = BasketItems::create([
+                'basket_id' => $basket->id,
+                'product_id' => $dto->productId,
+                'size_id' => $dto->sizeId,
+                'quantity' => $dto->quantity,
+            ]);
         }
 
-        $basketItem = BasketItems::create([
-            'basket_id' => $basket->id,
-            'product_id' => $productId,
-        ]);
+        $this->updateTotal($basket);
 
-        return $basketItem->load('product');
+        return $item->load(['product', 'size']);
+    }
+
+    public function updateItemQuantity(Basket $basket, int $itemId, int $quantity): BasketItems
+    {
+        return $this->updateItem($basket, $itemId, $quantity);
+    }
+
+    public function removeItem(Basket $basket, int $itemId): void
+    {
+        $basket->items()->where('id', $itemId)->delete();
+        $this->updateTotal($basket);
+    }
+
+    public function updateTotal(Basket $basket): Basket
+    {
+        $total = $basket->items()
+            ->with('product')
+            ->get()
+            ->sum(fn($item) => $item->product->price * $item->quantity);
+
+        $basket->total_price = round($total, 2);
+        $basket->save();
+
+        return $basket;
+    }
+
+    public function getBasketData(Basket $basket): array
+    {
+        $items = $basket->items()
+            ->with(['product.images', 'size'])
+            ->get();
+
+        return [
+            'items' => $items,
+            'total_price' => $basket->total_price,
+            'items_count' => $items->sum('quantity'),
+        ];
+    }
+
+    private function getItem(Basket $basket, int $itemId): BasketItems
+    {
+        return BasketItems::where('basket_id', $basket->id)
+            ->findOrFail($itemId);
+    }
+
+    private function updateItem(Basket $basket, int $itemId, int $quantity): BasketItems
+    {
+        $item = $this->getItem($basket, $itemId);
+
+        if ($quantity <= 0) {
+            $item->delete();
+            $this->updateTotal($basket);
+            throw new \RuntimeException('Item removed from basket');
+        }
+
+        $this->checkStock($item->product_id, $item->size_id, $quantity);
+
+        $item->quantity = $quantity;
+        $item->save();
+
+        $this->updateTotal($basket);
+
+        return $item->load(['product', 'size']);
     }
 }
